@@ -1,0 +1,14 @@
+OASISFormat: 0.4
+Name:        bap-types
+Version:     0.1
+Synopsis:    BAP Core Types
+Authors:     Matthew Maurer
+License:     BSD-3-clause
+Plugins:     META (0.4), DevFiles (0.4)
+
+Library "bap-traces"
+  Path:            .
+  BuildTools:      ocamlbuild
+  Modules:         Trace_container, Frame_piqi, Frame_piqi_ext
+  InternalModules: Arch_bfd
+  BuildDepends:    core_kernel, piqirun.pb, piqirun.ext, piqilib
