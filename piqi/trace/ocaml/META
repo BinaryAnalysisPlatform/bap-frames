@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: 4f1b6f7284fd2be3c78d6478454a0701)
+version = "0.1"
+description = "BAP Core Types"
+requires = "core_kernel bap-types piqirun.pb piqirun.ext piqilib"
+archive(byte) = "bap-traces.cma"
+archive(byte, plugin) = "bap-traces.cma"
+archive(native) = "bap-traces.cmxa"
+archive(native, plugin) = "bap-traces.cmxs"
+exists_if = "bap-traces.cma"
+# OASIS_STOP
+
