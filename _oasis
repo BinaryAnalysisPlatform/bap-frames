@@ -1,0 +1,25 @@
+OASISFormat: 0.4
+Name:        bap-types
+Version:     0.1
+Synopsis:    BAP Core Types
+Authors:     Matthew Maurer
+License:     BSD-3-clause
+Plugins:     META (0.4), DevFiles (0.4)
+
+PreBuildCommand:    sh piqi/compile_piqi.sh
+PostInstallCommand: sh piqi/cleanup.sh
+
+Library "bap-serialize-bil"
+  Path:         piqi/bil 
+  BuildTools:   ocamlbuild
+  Modules:      Stmt_piqi, Bil_piqi
+  InternalModules: Stmt_piqi_ext
+  BuildDepends: core_kernel, bap-types, piqirun.pb, piqirun.ext, piqilib
+
+Library "bap-traces"
+  Path: piqi/trace/ocaml
+  BuildTools: ocamlbuild
+  Modules: Trace_container, Frame_piqi, Frame_piqi_ext
+  InternalModules: Arch_bfd
+  BuildDepends: core_kernel, bap-types, piqirun.pb, piqirun.ext, piqilib
+

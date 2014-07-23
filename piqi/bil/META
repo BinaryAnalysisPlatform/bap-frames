@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: 7599c57ad5a63cea676fe4b79f72a578)
+version = "0.1"
+description = "BAP Core Types"
+requires = "core_kernel bap-types piqirun.pb piqirun.ext piqilib"
+archive(byte) = "bap-serialize-bil.cma"
+archive(byte, plugin) = "bap-serialize-bil.cma"
+archive(native) = "bap-serialize-bil.cmxa"
+archive(native, plugin) = "bap-serialize-bil.cmxs"
+exists_if = "bap-serialize-bil.cma"
+# OASIS_STOP
+
