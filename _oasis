@@ -1,7 +1,7 @@
 OASISFormat: 0.4
-Name:        bap-types
+Name:        bap-traces
 Version:     0.1
-Synopsis:    BAP Core Types
+Synopsis:    BAP Trace Format
 Authors:     Matthew Maurer
 License:     BSD-3-clause
 Plugins:     META (0.4), DevFiles (0.4)
@@ -12,3 +12,4 @@ Library "bap-traces"
   Modules:         Trace_container, Frame_piqi, Frame_piqi_ext
   InternalModules: Arch_bfd
   BuildDepends:    core_kernel, piqirun.pb, piqirun.ext, piqilib
+  DataFiles:       *.piqi
