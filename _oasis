@@ -10,6 +10,5 @@ Library "bap-traces"
   Path:            .
   BuildTools:      ocamlbuild
   Modules:         Trace_container, Frame_piqi, Frame_piqi_ext
-  InternalModules: Arch_bfd
-  BuildDepends:    core_kernel, piqirun.pb, piqirun.ext, piqilib
+  BuildDepends:    core_kernel, piqirun.pb, piqirun.ext, piqilib, bap-types
   DataFiles:       *.piqi
