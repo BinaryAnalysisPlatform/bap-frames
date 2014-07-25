@@ -1,4 +1,4 @@
-exception TraceException of string
+exception Trace_exception of string
 
 val default_frames_per_toc_entry : int64
 val default_auto_finish : bool

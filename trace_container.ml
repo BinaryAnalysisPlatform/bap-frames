@@ -6,7 +6,7 @@
 *)
 open Core_kernel.Std
 
-exception TraceException of string
+exception Trace_exception of string
 
 type frame = Frame_piqi.frame
 
@@ -125,7 +125,7 @@ class writer ?(arch=default_arch) ?(machine=default_machine) ?(frames_per_toc_en
       let s = Frame_piqi_ext.gen_frame frame `pb in
       let len = Int64.of_int (String.length s) in
       if len <= 0L then
-        raise (TraceException "Attempt to add zero-length frame to trace");
+        raise (Trace_exception "Attempt to add zero-length frame to trace");
 
       (* Write the length in binary *)
       let () = write_i64 oc len in
@@ -139,7 +139,7 @@ class writer ?(arch=default_arch) ?(machine=default_machine) ?(frames_per_toc_en
               = Out_channel.pos oc);
 
     method finish =
-      if is_finished then raise (TraceException "finish called twice");
+      if is_finished then raise (Trace_exception "finish called twice");
 
       let toc_offset = Out_channel.pos oc in
       (* Make sure the toc is the right size. *)
@@ -181,16 +181,16 @@ class reader filename =
   let ic = In_channel.create ~binary:true filename in
   (* Verify magic number *)
   let () = if read_i64 ic <> magic_number then
-      raise (TraceException "Magic number is incorrect") in
+      raise (Trace_exception "Magic number is incorrect") in
   (* Trace version *)
   let trace_version = read_i64 ic in
   let () = if trace_version < lowest_supported_version ||
               trace_version > highest_supported_version then
-      raise (TraceException "Unsupported trace version") in
+      raise (Trace_exception "Unsupported trace version") in
   (* Read arch type, break type safety *)
   let archnum = read_i64 ic in
   let () = if not (archnum < (Int64.of_int (Obj.magic Arch_bfd.Bfd_arch_last))) then
-      raise (TraceException "Invalid architecture") in
+      raise (Trace_exception "Invalid architecture") in
   let arch : Arch_bfd.bfd_architecture = Obj.magic (Int64.to_int archnum) in
   let machine = read_i64 ic in
   (* Read number of trace frames. *)
@@ -250,7 +250,7 @@ class reader filename =
       let () = self#check_end_of_trace "get_frame on non-existant frame" in
       let frame_len = read_i64 ic in
       if (frame_len <= 0L) then
-        raise (TraceException (Printf.sprintf "Read zero-length frame at offset %#Lx" (LargeFile.pos_in ic)));
+        raise (Trace_exception (Printf.sprintf "Read zero-length frame at offset %#Lx" (LargeFile.pos_in ic)));
       let buf = String.create (Int64.to_int_exn frame_len) in
       (* Read the frame info buf. *)
       match In_channel.really_input ic ~buf:buf ~pos:0 ~len:(Int64.to_int_exn frame_len) with
@@ -277,11 +277,11 @@ class reader filename =
 
     method private check_end_of_trace_num frame_num msg =
       if self#end_of_trace_num frame_num then
-        raise (TraceException msg)
+        raise (Trace_exception msg)
 
     method private check_end_of_trace msg =
       if self#end_of_trace then
-        raise (TraceException msg)
+        raise (Trace_exception msg)
 
     initializer self#seek 0L
   end
