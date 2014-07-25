@@ -65,8 +65,8 @@ end
 (* XXX: Auto-pull this from C++ header file *)
 let default_frames_per_toc_entry = 10000L
 and default_auto_finish = false
-and default_arch = Arch_bfd.Bfd_arch_i386
-and default_machine = 0L
+and default_arch = Arch.X86_32
+and default_machine = 1L
 
 (* Internal definitions *)
 let magic_number = 7456879624156307493L
@@ -82,7 +82,7 @@ let out_trace_version = 1L
 and lowest_supported_version = 1L
 and highest_supported_version = 1L
 
-let write_i64 oc i64 = output_string oc (Int64.to_string i64)
+let write_i64 oc i64 = Out_channel.output_string oc (Int64.to_string i64)
 
 let read_i64 = In_channel.read_i64
 
@@ -158,9 +158,11 @@ class writer ?(arch=default_arch) ?(machine=default_machine) ?(frames_per_toc_en
       let () = write_i64 oc out_trace_version in
       (* CPU architecture. *)
       let () = Out_channel.seek oc bfd_arch_offset in
-      (* Goodbye type safety! *)
-      let () = write_i64 oc (Int64.of_int (Obj.magic arch)) in
+      let {Arch.Trace_nums.arch = archnum; mach = machnum} =
+        Arch.to_trace_nums arch in
+      let () = write_i64 oc archnum in
       (* Machine type. *)
+      assert Int64.(machine = machnum);
       let () = Out_channel.seek oc bfd_machine_offset in
       let () = write_i64 oc machine in
       (* Number of trace frames. *)
@@ -187,12 +189,13 @@ class reader filename =
   let () = if trace_version < lowest_supported_version ||
               trace_version > highest_supported_version then
       raise (TraceException "Unsupported trace version") in
-  (* Read arch type, break type safety *)
+  (* Read arch and machine type *)
   let archnum = read_i64 ic in
-  let () = if not (archnum < (Int64.of_int (Obj.magic Arch_bfd.Bfd_arch_last))) then
-      raise (TraceException "Invalid architecture") in
-  let arch : Arch_bfd.bfd_architecture = Obj.magic (Int64.to_int archnum) in
   let machine = read_i64 ic in
+  let arch = let open Arch in
+    match of_trace_nums {Trace_nums.arch = archnum; mach = machine} with
+    | Some arch -> arch
+    | None -> raise (TraceException "Invalid architecture") in
   (* Read number of trace frames. *)
   let num_frames = read_i64 ic in
   (* Find offset of toc. *)
