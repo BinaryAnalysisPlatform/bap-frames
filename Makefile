@@ -56,3 +56,13 @@ check-ocp-indent: *.ml
 .PHONY: auto-ocp-indent
 auto-ocp-indent: *.ml
 	for mlfile in $^; do $(OCI) -i $$mlfile; done
+
+SANDBOX_DEPS=bap-types
+SANDBOX_FILTER=$(foreach dir,$(SANDBOX_DEPS),-path ./$(dir) -prune -o)
+
+.PHONY: sandbox-deps
+sandbox-deps:
+	for pack in $(SANDBOX_DEPS); do make -C $$pack configure; make -C $$pack; make -C $$pack install; done
+.PHONY: sandbox-destroy
+sandbox-destroy:
+	rm -rf $(OCAMLSANDBOX)

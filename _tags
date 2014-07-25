@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: fe79ebb5b238935cb0b98cd756ddda81)
+# DO NOT EDIT (digest: 4ec01587a0a4a925a100db6f38101e6b)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -15,6 +15,7 @@
 "_darcs": not_hygienic
 # Library bap-traces
 "bap-traces.cmxs": use_bap-traces
+<*.ml{,i}>: pkg_bap-types
 <*.ml{,i}>: pkg_core_kernel
 <*.ml{,i}>: pkg_piqilib
 <*.ml{,i}>: pkg_piqirun.ext
