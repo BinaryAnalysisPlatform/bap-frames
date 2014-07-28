@@ -1,0 +1,8 @@
+Verified+1: Jenkins CI
+Code-Review+1: Vincent Huang <vincenth@andrew.cmu.edu>
+Code-Review+2: Matthew Maurer <maurer@matthewmaurer.org>
+Submitted-by: Matthew Maurer <maurer@matthewmaurer.org>
+Submitted-at: Mon, 28 Jul 2014 10:30:23 -0400
+Reviewed-on: https://gerrit.aegis.cylab.cmu.edu/61
+Project: bap-traces
+Branch: refs/heads/master
