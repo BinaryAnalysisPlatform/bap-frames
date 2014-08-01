@@ -3,6 +3,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_CXXFLAGS = -fPIC -DPIC
 
 lib_LIBRARIES = libtrace.a
+pkginclude_HEADERS = trace.container.hpp arch.hpp frame.piqi.pb.h config.h
 
 PIQI = piqi
 PROTOC = protoc
