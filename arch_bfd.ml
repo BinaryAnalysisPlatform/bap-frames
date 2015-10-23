@@ -1,5 +1,6 @@
 (* File generated from arch.idl *)
 
+
 type bfd_architecture =
   | Bfd_arch_unknown
   | Bfd_arch_obscure
@@ -79,7 +80,9 @@ type bfd_architecture =
   | Bfd_arch_lm32
   | Bfd_arch_microblaze
   | Bfd_arch_last
-and machine_t = int
+with sexp
+
+type machine_t = int
 
 let mach_i386_i386 = 1
 

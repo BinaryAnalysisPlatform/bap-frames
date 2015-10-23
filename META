@@ -1,12 +1,22 @@
 # OASIS_START
-# DO NOT EDIT (digest: 043d7edb52f5d422d6ff26da03c2bdef)
+# DO NOT EDIT (digest: c0a6f728d153ac905924d15441ae661a)
 version = "0.1"
 description = "BAP Trace Format"
-requires = "core_kernel piqirun.pb piqirun.ext piqilib"
+requires = "core_kernel piqirun.pb piqirun.ext piqilib sexplib.syntax"
 archive(byte) = "bap-traces.cma"
 archive(byte, plugin) = "bap-traces.cma"
 archive(native) = "bap-traces.cmxa"
 archive(native, plugin) = "bap-traces.cmxs"
 exists_if = "bap-traces.cma"
+package "plugin" (
+ version = "0.1"
+ description = "BAP Trace Format"
+ requires = "bap bap-traces"
+ archive(byte) = "bap-traces-plugin.cma"
+ archive(byte, plugin) = "bap-traces-plugin.cma"
+ archive(native) = "bap-traces-plugin.cmxa"
+ archive(native, plugin) = "bap-traces-plugin.cmxs"
+ exists_if = "bap-traces-plugin.cma"
+)
 # OASIS_STOP
 

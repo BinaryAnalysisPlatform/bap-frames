@@ -11,5 +11,25 @@ Library "bap-traces"
   BuildTools:      ocamlbuild
   Modules:         Trace_container, Frame_piqi, Frame_piqi_ext
   InternalModules: Arch_bfd
-  BuildDepends:    core_kernel, piqirun.pb, piqirun.ext, piqilib
+  BuildDepends:    core_kernel, piqirun.pb, piqirun.ext, piqilib, sexplib.syntax
   DataFiles:       *.piqi
+
+Library "bap-traces-plugin"
+  Path:            plugin
+  BuildTools:      ocamlbuild
+  FindlibName:     plugin
+  FindlibParent:   bap-traces
+  Modules:         Frame_trace_plugin
+  InternalModules: Frame_events
+  BuildDepends:    bap, bap-traces
+
+Executable tracedump
+  Path:           test
+  MainIs:         tracedump.ml
+  BuildTools:     ocamlbuild
+  CompiledObject: best
+  Install:        false
+  BuildDepends:   bap, bap-traces, bap-traces.plugin, cmdliner
+
+  
+

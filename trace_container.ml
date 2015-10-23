@@ -191,7 +191,7 @@ class reader filename =
   let archnum = read_i64 ic in
   let () = if not (archnum < (Int64.of_int (Obj.magic Arch_bfd.Bfd_arch_last))) then
       raise (Trace_exception "Invalid architecture") in
-  let arch : Arch_bfd.bfd_architecture = Obj.magic (Int64.to_int archnum) in
+  let arch : Arch_bfd.bfd_architecture = Obj.magic (Int64.to_int_exn archnum) in
   let machine = read_i64 ic in
   (* Read number of trace frames. *)
   let num_frames = read_i64 ic in

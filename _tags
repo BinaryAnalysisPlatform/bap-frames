@@ -1,8 +1,9 @@
 # OASIS_START
-# DO NOT EDIT (digest: fe79ebb5b238935cb0b98cd756ddda81)
+# DO NOT EDIT (digest: 18319d993797e2bd34bf113e924cf4e3)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
+true: annot, bin_annot
 <**/.svn>: -traverse
 <**/.svn>: not_hygienic
 ".bzr": -traverse
@@ -15,8 +16,37 @@
 "_darcs": not_hygienic
 # Library bap-traces
 "bap-traces.cmxs": use_bap-traces
-<*.ml{,i}>: pkg_core_kernel
-<*.ml{,i}>: pkg_piqilib
-<*.ml{,i}>: pkg_piqirun.ext
-<*.ml{,i}>: pkg_piqirun.pb
+<*.ml{,i,y}>: pkg_core_kernel
+<*.ml{,i,y}>: pkg_piqilib
+<*.ml{,i,y}>: pkg_piqirun.ext
+<*.ml{,i,y}>: pkg_piqirun.pb
+<*.ml{,i,y}>: pkg_sexplib.syntax
+# Library bap-traces-plugin
+"plugin/bap-traces-plugin.cmxs": use_bap-traces-plugin
+<plugin/*.ml{,i,y}>: pkg_bap
+<plugin/*.ml{,i,y}>: pkg_core_kernel
+<plugin/*.ml{,i,y}>: pkg_piqilib
+<plugin/*.ml{,i,y}>: pkg_piqirun.ext
+<plugin/*.ml{,i,y}>: pkg_piqirun.pb
+<plugin/*.ml{,i,y}>: pkg_sexplib.syntax
+<plugin/*.ml{,i,y}>: use_bap-traces
+# Executable tracedump
+<test/tracedump.{native,byte}>: pkg_bap
+<test/tracedump.{native,byte}>: pkg_cmdliner
+<test/tracedump.{native,byte}>: pkg_core_kernel
+<test/tracedump.{native,byte}>: pkg_piqilib
+<test/tracedump.{native,byte}>: pkg_piqirun.ext
+<test/tracedump.{native,byte}>: pkg_piqirun.pb
+<test/tracedump.{native,byte}>: pkg_sexplib.syntax
+<test/tracedump.{native,byte}>: use_bap-traces
+<test/tracedump.{native,byte}>: use_bap-traces-plugin
+<test/*.ml{,i,y}>: pkg_bap
+<test/*.ml{,i,y}>: pkg_cmdliner
+<test/*.ml{,i,y}>: pkg_core_kernel
+<test/*.ml{,i,y}>: pkg_piqilib
+<test/*.ml{,i,y}>: pkg_piqirun.ext
+<test/*.ml{,i,y}>: pkg_piqirun.pb
+<test/*.ml{,i,y}>: pkg_sexplib.syntax
+<test/*.ml{,i,y}>: use_bap-traces
+<test/*.ml{,i,y}>: use_bap-traces-plugin
 # OASIS_STOP

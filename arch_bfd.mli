@@ -78,8 +78,10 @@ type bfd_architecture =
   | Bfd_arch_z80
   | Bfd_arch_lm32
   | Bfd_arch_microblaze
-  | Bfd_arch_last
-and machine_t = int
+  | Bfd_arch_last 
+with sexp
+
+type machine_t = int
 
 val mach_i386_i386 : int
 val mach_x86_64 : int
