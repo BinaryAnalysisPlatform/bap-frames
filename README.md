@@ -1,3 +1,4 @@
 # Overview
-Bap-traces library contains trace file format description on [piqi](http://piqi.org/) language. It also provide [qemu-tracer](https://github.com/BinaryAnalysisPlatform/qemu-tracer) trace files reader and plugin to [bap](https://github.com/BinaryAnalysisPlatform/bap) trace library.
-
+Bap-traces library contains trace file format description in [piqi](http://piqi.org/) language. 
+The format is used to store traces from our QEMU [tracer](https://github.com/BinaryAnalysisPlatform/qemu). 
+A [BAP](https://github.com/BinaryAnalysisPlatform/bap) plugin, that adds support for this format is located in `plugin` folder. An example application, `tracedump` can be found in `test` folder.
