@@ -58,5 +58,6 @@ cd libs
 
 LIBS="libc-bin libstdc++6 libcap2"
 fetcharch armel ubuntu precise
+fetcharch i386 precise
 # mini debootstrap 
 
