@@ -21,9 +21,15 @@ let print_error = function
   | `System_error err -> prerr_string @@ Unix.error_message err
   | `No_provider -> prerr_string "No provider for a given URI"
   | `Ambiguous_uri -> prerr_string "More than one provider for a given URI"
+
   
 let main uri =
   Trace.load uri >>|
+  (fun trace ->
+     Trace.meta trace |>
+     Dict.data |>
+     Sequence.iter ~f:(Format.printf "meta: @[%a@]@." Value.pp);
+     trace) >>|
   Trace.events >>|
   Sequence.iter ~f:(Format.printf "@[%a@]@." Value.pp)
 

@@ -56,12 +56,13 @@ end = struct
     | `r64 -> Bitvector.of_int64 ~width:64 address
 
   let move arch tag cell width value =
-    let endian =
-      Option.value_map arch ~default:Bitvector.LittleEndian ~f:Arch.endian in
-    Value.create tag Trace.Move.{
-        cell; 
-        data = let width = match width with 0 -> None | w -> Some w in
-          Bitvector.(of_binary ?width endian value)}
+    let data =
+      let endian =
+        Option.value_map arch ~default:Bitvector.LittleEndian ~f:Arch.endian in
+      let width = match width with 0 -> None | w -> Some w in
+      Bitvector.of_binary ?width endian value in
+    Trace.Move.Fields.create ~cell ~data |>
+    Value.create tag
 
   let memory_operation arch tag mo width value =
     move arch tag (addr_of_address arch mo.Frame.Mem_operand.address)
@@ -87,33 +88,31 @@ end = struct
     Value.create pc_update (addr_of_address arch address)
 
   let code_exec arch address data =
-    Value.create code_exec Trace.Chunk.{
-        addr = addr_of_address arch address;
-        data
-      }
+    Trace.Chunk.Fields.create ~addr:(addr_of_address arch address) ~data |>
+    Value.create code_exec
 
   let context_switch id =
     Value.create context_switch @@ Int64.to_int_exn id
 
   let syscall ~number args =
-    Value.create syscall Trace.Syscall.{
-        number = Int64.to_int_exn number;
-        args = Array.of_list @@ List.map ~f:Bitvector.of_int64 args
-      }
+    Trace.Syscall.Fields.create
+      ~number:(Int64.to_int_exn number)
+      ~args:(Array.of_list @@ List.map ~f:Bitvector.of_int64 args) |>
+    Value.create syscall
 
   let exn arch number ~from_addr ~to_addr =
-    Value.create exn Trace.Exn.{
-        number = Int64.to_int_exn number;
-        src = Option.map from_addr ~f:(addr_of_address arch);
-        dst = Option.map to_addr ~f:(addr_of_address arch)
-      }
+    Trace.Exn.Fields.create
+        ~number:(Int64.to_int_exn number)
+        ~src:(Option.map from_addr ~f:(addr_of_address arch))
+        ~dst:(Option.map to_addr ~f:(addr_of_address arch)) |>
+    Value.create exn
 
   let modload arch name low high =
-    Value.create modload Trace.Modload.{
-        name;
-        low = addr_of_address arch low;
-        high = addr_of_address arch high;
-      }
+    Trace.Modload.Fields.create
+      ~name
+      ~low:(addr_of_address arch low)
+      ~high:(addr_of_address arch high) |>
+    Value.create modload
 end
 
 let of_new_frame context arch address thread_id =
