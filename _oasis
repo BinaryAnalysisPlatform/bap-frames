@@ -1,35 +1,29 @@
 OASISFormat: 0.4
-Name:        bap-traces
+Name:        bap-frames
 Version:     0.1
-Synopsis:    BAP Trace Format
-Authors:     Matthew Maurer
-License:     BSD-3-clause
-Plugins:     META (0.4), DevFiles (0.4)
+Synopsis:    data format for execution traces
+Authors:     BAP Team
+License:     MIT
+Plugins:     META (0.4)
+BuildTools:  ocamlbuild, bapbuild
 
-Library "bap-traces"
+Library "bap-frames"
   Path:            .
-  BuildTools:      ocamlbuild
-  Modules:         Trace_container, Frame_piqi, Frame_piqi_ext
-  InternalModules: Arch_bfd
-  BuildDepends:    core_kernel, piqirun.pb, piqirun.ext, piqilib, sexplib.syntax
+  Modules:         Trace_container, Frame_piqi, Frame_piqi_ext, Arch_bfd
+  BuildDepends:    core_kernel, piqirun.pb, piqirun.ext, piqilib, ppx_jane
   DataFiles:       *.piqi
 
-Library "bap-traces-plugin"
+Library "bap-plugin-frames"
   Path:            plugin
-  BuildTools:      ocamlbuild
-  FindlibName:     plugin
-  FindlibParent:   bap-traces
+  FindlibName:     bap-plugin-frames
   Modules:         Frame_trace_plugin
   InternalModules: Frame_events
-  BuildDepends:    bap, bap-traces
+  BuildDepends:    bap, bap-frames, bap-traces
+  XMETADescription: read traces in frames format
 
 Executable tracedump
   Path:           test
   MainIs:         tracedump.ml
-  BuildTools:     ocamlbuild
   CompiledObject: best
   Install:        false
-  BuildDepends:   bap, bap-traces, bap-traces.plugin, cmdliner
-
-  
-
+  BuildDepends:   bap, bap-frames, bap-plugin-frames, cmdliner

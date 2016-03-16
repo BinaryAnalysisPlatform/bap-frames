@@ -22,3 +22,7 @@
 /setup.log
 /setup.ml
 META
+/META
+/frames.ml
+/myocamlbuild.ml
+/setup.ml

@@ -1,6 +1,7 @@
 open Core_kernel.Std
 open Bap.Std
-open Trace.Event
+open Bap_traces.Std
+open Event
 
 module Frame = Frame_piqi
 module EF : sig
@@ -61,7 +62,7 @@ end = struct
         Option.value_map arch ~default:Bitvector.LittleEndian ~f:Arch.endian in
       let width = match width with 0 -> None | w -> Some w in
       Bitvector.of_binary ?width endian value in
-    Trace.Move.Fields.create ~cell ~data |>
+    Move.Fields.create ~cell ~data |>
     Value.create tag
 
   let memory_operation arch tag mo width value =
@@ -88,27 +89,27 @@ end = struct
     Value.create pc_update (addr_of_address arch address)
 
   let code_exec arch address data =
-    Trace.Chunk.Fields.create ~addr:(addr_of_address arch address) ~data |>
+    Chunk.Fields.create ~addr:(addr_of_address arch address) ~data |>
     Value.create code_exec
 
   let context_switch id =
     Value.create context_switch @@ Int64.to_int_exn id
 
   let syscall ~number args =
-    Trace.Syscall.Fields.create
+    Syscall.Fields.create
       ~number:(Int64.to_int_exn number)
       ~args:(Array.of_list @@ List.map ~f:Bitvector.of_int64 args) |>
     Value.create syscall
 
   let exn arch number ~from_addr ~to_addr =
-    Trace.Exn.Fields.create
-        ~number:(Int64.to_int_exn number)
-        ~src:(Option.map from_addr ~f:(addr_of_address arch))
-        ~dst:(Option.map to_addr ~f:(addr_of_address arch)) |>
+    Exn.Fields.create
+      ~number:(Int64.to_int_exn number)
+      ~src:(Option.map from_addr ~f:(addr_of_address arch))
+      ~dst:(Option.map to_addr ~f:(addr_of_address arch)) |>
     Value.create exn
 
   let modload arch name low high =
-    Trace.Modload.Fields.create
+    Modload.Fields.create
       ~name
       ~low:(addr_of_address arch low)
       ~high:(addr_of_address arch high) |>
@@ -116,16 +117,16 @@ end = struct
 end
 
 let of_new_frame context arch address thread_id =
-    if context thread_id then 
-      [EF.pc_update arch address; EF.context_switch thread_id]
-    else 
-      [EF.pc_update arch address]
+  if context thread_id then
+    [EF.pc_update arch address; EF.context_switch thread_id]
+  else
+    [EF.pc_update arch address]
 
 let of_operand_usage usage of_read of_written bit_length binary =
   let open Frame.Operand_usage in
   match usage.read, usage.written with
-  | true, true -> [of_read bit_length binary; 
-                  of_written bit_length binary]
+  | true, true -> [of_read bit_length binary;
+                   of_written bit_length binary]
   | true, false -> [of_read bit_length binary]
   | false, true -> [of_written bit_length binary]
   | false, false -> [] (*FIXME: error occure?*)
@@ -147,17 +148,17 @@ let of_operand_info arch oi =
     of_mem_operand arch mo oi.operand_usage oi.bit_length oi.value
   | `reg_operand ro ->
     of_reg_operand arch ro oi.operand_usage oi.bit_length oi.value
-  
+
 let of_operand_value_list arch ovl =
   List.concat @@ List.map ~f:(of_operand_info arch) ovl
 
 let of_std_frame context arch frm =
   let open Frame.Std_frame in
   List.concat [of_new_frame context arch frm.address frm.thread_id;
-    [EF.code_exec arch frm.address frm.rawbytes];
-    of_operand_value_list arch frm.operand_pre_list;
-    Option.value_map frm.operand_post_list ~default:[]
-      ~f:(of_operand_value_list arch)]
+               [EF.code_exec arch frm.address frm.rawbytes];
+               of_operand_value_list arch frm.operand_pre_list;
+               Option.value_map frm.operand_post_list ~default:[]
+                 ~f:(of_operand_value_list arch)]
 
 let of_syscall_frame context arch frm =
   let open Frame.Syscall_frame in
@@ -184,4 +185,3 @@ let of_frame ~context ?arch = function
   | `taint_intro_frame frm -> []
   | `modload_frame frm -> of_modload_frame arch frm
   | `key_frame frm -> []
-

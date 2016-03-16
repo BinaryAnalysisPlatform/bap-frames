@@ -80,7 +80,7 @@ type bfd_architecture =
   | Bfd_arch_lm32
   | Bfd_arch_microblaze
   | Bfd_arch_last
-with sexp
+  [@@deriving sexp]
 
 type machine_t = int
 
@@ -89,4 +89,3 @@ let mach_i386_i386 = 1
 let mach_x86_64 = 64
 
 let mach_arm_5TE = 9
-

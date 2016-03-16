@@ -1,6 +1,3 @@
-# OASIS_START
-# DO NOT EDIT (digest: a3c674b4239234cbbe53afe090018954)
-
 SETUP = ocaml setup.ml
 
 build: setup.data
@@ -12,17 +9,21 @@ doc: setup.data build
 test: setup.data build
 	$(SETUP) -test $(TESTFLAGS)
 
-all:
-	$(SETUP) -all $(ALLFLAGS)
+all: build install
 
 install: setup.data
 	$(SETUP) -install $(INSTALLFLAGS)
+	make plugin
 
 uninstall: setup.data
 	$(SETUP) -uninstall $(UNINSTALLFLAGS)
 
-reinstall: setup.data
-	$(SETUP) -reinstall $(REINSTALLFLAGS)
+plugin:
+	make -C plugin
+
+reinstall:
+	make uninstall;
+	make install
 
 clean:
 	$(SETUP) -clean $(CLEANFLAGS)
@@ -36,9 +37,8 @@ setup.data:
 configure:
 	$(SETUP) -configure $(CONFIGUREFLAGS)
 
-.PHONY: build doc test all install uninstall reinstall clean distclean configure
+.PHONY: build doc test all install uninstall reinstall clean distclean configure plugin
 
-# OASIS_STOP
 PIQI=piqi
 OCI=ocp-indent
 

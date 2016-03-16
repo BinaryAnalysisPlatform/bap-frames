@@ -78,8 +78,8 @@ type bfd_architecture =
   | Bfd_arch_z80
   | Bfd_arch_lm32
   | Bfd_arch_microblaze
-  | Bfd_arch_last 
-with sexp
+  | Bfd_arch_last
+  [@@deriving sexp]
 
 type machine_t = int
 

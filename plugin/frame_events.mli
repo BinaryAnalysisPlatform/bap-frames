@@ -1,4 +1,5 @@
 open Bap.Std
+open Bap_traces.Std
 
 module Frame = Frame_piqi
 

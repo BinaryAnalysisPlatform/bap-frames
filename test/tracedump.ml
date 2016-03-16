@@ -1,9 +1,8 @@
 open Core_kernel.Std
 open Bap.Std
+open Bap_traces.Std
 open Result
 open Cmdliner
-
-let () = Frame_trace_plugin.register ()
 
 let uri =
   let doc = "Trace resource identifier RFC3986." in
@@ -22,7 +21,6 @@ let print_error = function
   | `No_provider -> prerr_string "No provider for a given URI"
   | `Ambiguous_uri -> prerr_string "More than one provider for a given URI"
 
-  
 let main uri =
   Trace.load uri >>|
   (fun trace ->
@@ -42,9 +40,10 @@ let cmd =
   Term.(pure main $ uri),
   Term.info "tracedump" ~doc ~man
 
-let () = 
-  match Term.eval cmd with 
-  | `Error _ -> exit 1 
+let () =
+  let module M = Frame_trace_plugin in
+  match Term.eval cmd with
+  | `Error _ -> exit 1
   | `Ok result ->
     begin
       match result with
@@ -53,4 +52,3 @@ let () =
     end
   | `Version
   | `Help -> exit 0
-
