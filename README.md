@@ -21,7 +21,7 @@
 1. Add our opam repository if you don't have one
 
    ```
-   opam repository add bap git://github.com/BinaryAnalysisPlatform/bap.git
+   opam repository add bap git://github.com/BinaryAnalysisPlatform/opam-repository.git
    ```
 2. install 
 
