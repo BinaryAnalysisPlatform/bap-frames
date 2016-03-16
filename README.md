@@ -1,4 +1,8 @@
 # Overview
-Bap-traces library contains trace file format description in [piqi](http://piqi.org/) language. 
-The format is used to store traces from our QEMU [tracer](https://github.com/BinaryAnalysisPlatform/qemu). 
-A [BAP](https://github.com/BinaryAnalysisPlatform/bap) plugin, that adds support for this format is located in `plugin` folder. An example application, `tracedump` can be found in `test` folder.
+`Frames` is a format for storing execution traces. This repository contains:
+- A description in [piqi](http://piqi.org/) language of the `frames` format;
+- A `C` library for writing data in the `frames` format
+- An `OCaml` library `bap-frames` for reading data in the `frames` format
+- A BAP plugin `frame` that provides `frames` format reader for the `bap-plugins` library
+- A playground `test/tracedump` to inspect the traces
+
