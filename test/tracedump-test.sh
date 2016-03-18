@@ -30,6 +30,11 @@ if ! which qemu-arm > /dev/null; then
     exit 1
 fi
 
+if ! which bap-tracedump > /dev/null; then
+    echo "bap-tracedump not found, install bap-tracedump from bap opam repository"
+    exit 1
+fi
+
 TEST_FILES="uname who whoami pinky pwd uptime tty nproc du"
 
 trap error ERR
@@ -42,11 +47,11 @@ for f in $TEST_FILES; do
     for b in `find $ARM_BINARIES -type f -name "*_$f"`; do
         printf '%-70s' $b
         if [ "$f" == "du" ]; then
-            qemu-arm -tracefile /tmp/$f.frame $b /tmp >/dev/null
+            qemu-arm -tracefile /tmp/$f.frames $b /tmp >/dev/null
         else
-            qemu-arm -tracefile /tmp/$f.frame $b >/dev/null
+            qemu-arm -tracefile /tmp/$f.frames $b >/dev/null
         fi
-        ../tracedump.native file:///tmp/$f.frame >/dev/null
+        bap-tracedump file:///tmp/$f.frames >/dev/null
         echo "[OK]"
     done
 done

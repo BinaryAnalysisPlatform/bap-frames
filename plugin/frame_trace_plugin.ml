@@ -29,7 +29,12 @@ let create_frame_reader path =
       Arch_bfd.sexp_of_bfd_architecture reader#get_arch |>
       Sexp.to_string |>
       String.substr_replace_all ~pattern:"Bfd_arch_" ~with_:"" |>
-      Arch.of_string
+      Arch.of_string |>
+      Option.map ~f:(function
+          | `x86 when
+              reader#get_machine = (Int64.of_int Arch_bfd.mach_x86_64) -> `x86_64
+          | a -> a)
+
 
     method meta =
       let set : 'a. 'a tag -> 'a option -> Dict.t -> Dict.t = fun tag value dict ->

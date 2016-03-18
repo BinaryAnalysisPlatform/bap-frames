@@ -20,10 +20,3 @@ Library "bap-plugin-frames"
   InternalModules: Frame_events
   BuildDepends:    bap, bap-frames, bap-traces
   XMETADescription: read traces in frames format
-
-Executable tracedump
-  Path:           test
-  MainIs:         tracedump.ml
-  CompiledObject: best
-  Install:        false
-  BuildDepends:   bap, bap-frames, bap-plugin-frames, cmdliner
