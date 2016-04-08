@@ -147,7 +147,10 @@ let of_operand_info arch oi =
   | `mem_operand mo ->
     of_mem_operand arch mo oi.operand_usage oi.bit_length oi.value
   | `reg_operand ro ->
-    of_reg_operand arch ro oi.operand_usage oi.bit_length oi.value
+    let length = 
+      if oi.bit_length = 0 then String.length oi.value * 8
+      else oi.bit_length in
+    of_reg_operand arch ro oi.operand_usage length oi.value
 
 let of_operand_value_list arch ovl =
   List.concat @@ List.map ~f:(of_operand_info arch) ovl
