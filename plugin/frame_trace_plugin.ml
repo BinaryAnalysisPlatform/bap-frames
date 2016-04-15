@@ -29,14 +29,24 @@ let create_frame_reader path =
       Arch_bfd.sexp_of_bfd_architecture reader#get_arch |>
       Sexp.to_string |>
       String.substr_replace_all ~pattern:"Bfd_arch_" ~with_:"" |>
-      Arch.of_string
+      Arch.of_string |>
+      Option.map ~f:(function
+          | `x86 when
+              reader#get_machine = (Int64.of_int Arch_bfd.mach_x86_64) -> `x86_64
+          | a -> a)
+
 
     method meta =
       let set : 'a. 'a tag -> 'a option -> Dict.t -> Dict.t = fun tag value dict ->
         Option.value_map value
           ~f:(fun value -> Dict.set dict tag value) ~default:dict in
       let open Meta in
-      set tracer self#tracer_meta Dict.empty |>
+      let meta = if reader#get_trace_version = 1L
+        then Dict.empty
+        else match reader#get_frame with
+          | `meta_frame f -> Frame_events.of_meta_frame f
+          | _ -> Dict.empty in
+      set tracer self#tracer_meta meta |>
       set arch self#arch_meta
 
     method next () =
