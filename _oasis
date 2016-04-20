@@ -1,29 +1,32 @@
 OASISFormat: 0.4
 Name:        bap-frames
-Version:     0.1
+Version:     1.0.0-alpha
 Synopsis:    data format for execution traces
 Authors:     BAP Team
 License:     MIT
 Plugins:     META (0.4)
-BuildTools:  ocamlbuild, bapbuild
+BuildTools:  ocamlbuild
+
+Library bfd
+  Path:            lib/bfd
+  Modules:         Bfd
+  FindlibName:     bfd
+  CompiledObject:  best
+  BuildDepends:    ppx_deriving.std
+
 
 Library "bap-frames"
-  Path:            .
-  Modules:         Trace_container, Frame_piqi, Frame_piqi_ext, Arch_bfd
-  BuildDepends:    core_kernel, piqirun.pb, piqirun.ext, piqilib, ppx_jane
-  DataFiles:       *.piqi
+  Path:            lib/frames
+  Modules:         Frame_events, Frame_piqi, Frame_reader
+  FindlibName:     bap-frames
+  BuildTools:      piqi
+  BuildDepends:    bap, bap-traces, bfd, core_kernel, piqirun.pb, ppx_jane, ppx_deriving.std
+  CompiledObject:  best
+  DataFiles:       ../../*.piqi
 
 Library "bap-plugin-frames"
   Path:            plugin
   FindlibName:     bap-plugin-frames
   Modules:         Frame_trace_plugin
-  InternalModules: Frame_events
   BuildDepends:    bap, bap-frames, bap-traces
   XMETADescription: read traces in frames format
-
-Executable tracedump
-  Path:           test
-  MainIs:         tracedump.ml
-  CompiledObject: best
-  Install:        false
-  BuildDepends:   bap, bap-frames, bap-plugin-frames, cmdliner

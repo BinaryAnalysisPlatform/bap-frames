@@ -28,7 +28,7 @@ let main uri =
      Dict.data |>
      Sequence.iter ~f:(Format.printf "meta: @[%a@]@." Value.pp);
      trace) >>|
-  Trace.events >>|
+  Trace.read_events >>|
   Sequence.iter ~f:(Format.printf "@[%a@]@." Value.pp)
 
 let cmd =
