@@ -1,4 +1,5 @@
-% command line arguments
+% trace meta information
+% since v2
 
 .record [
   .name meta-frame

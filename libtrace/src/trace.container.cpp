@@ -24,7 +24,7 @@ typedef off_t traceoff_t;
 namespace SerializedTrace {
 
   TraceContainerWriter::TraceContainerWriter(std::string filename,
-                                             bfd_architecture arch,
+                                             frame_architecture arch,
                                              uint64_t machine,
                                              uint64_t frames_per_toc_entry_in,
                                              bool auto_finish_in) throw (TraceException)
@@ -125,12 +125,12 @@ namespace SerializedTrace {
     WRITE(out_trace_version);
 
     /* CPU architecture. */
-    SEEK(ofs, bfd_arch_offset);
+    SEEK(ofs, frame_arch_offset);
     uint64_t archt = (uint64_t) arch;
     WRITE(archt);
 
     /* Machine type. */
-    SEEK(ofs, bfd_machine_offset);
+    SEEK(ofs, frame_machine_offset);
     WRITE(mach);
 
     /* Numer of trace frames */
@@ -172,7 +172,7 @@ namespace SerializedTrace {
 
     uint64_t archt;
     READ(archt);
-    arch = (bfd_architecture) archt;
+    arch = (frame_architecture) archt;
 
     READ(mach);
 
@@ -219,7 +219,7 @@ namespace SerializedTrace {
     return frames_per_toc_entry;
   }
 
-  bfd_architecture TraceContainerReader::get_arch(void) throw () {
+  frame_architecture TraceContainerReader::get_arch(void) throw () {
     return arch;
   }
 

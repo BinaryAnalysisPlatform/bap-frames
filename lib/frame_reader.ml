@@ -18,7 +18,7 @@ type field =
 type header = {
   magic : int64;
   version : int;
-  bfd_arch : Bfd.Arch.t;
+  bfd_arch : Frame_arch.t;
   bfd_mach : int;
   frames : int64;
   toc_off : int64;
@@ -49,7 +49,7 @@ type t = reader
     trace header, in particular we need endianness information.
 *)
 module Arch = struct
-  let arm n = Bfd.Mach.Arm.(match of_enum n with
+  let arm n = Frame_mach.Arm.(match of_enum n with
       | Some V4 -> Some `armv4
       | Some V4T -> Some `thumbv4
       | Some V5 -> Some `armv5
@@ -58,33 +58,34 @@ module Arch = struct
       | Some _ -> Some `armv7
       | None -> None)
 
-  let mips n = Bfd.Mach.Mips.(match of_enum n with
+  let mips n = Frame_mach.Mips.(match of_enum n with
+      | Some Unknown -> Some `mips
       | Some (Isa32 | Isa32r2) -> Some `mips
       | Some (Isa64 | Isa64r2) -> Some `mips64
       | None -> None)
 
-  let ppc n = Bfd.Mach.Ppc.(match of_enum n with
+  let ppc n = Frame_mach.Ppc.(match of_enum n with
       | Some Ppc32 -> Some `ppc
       | Some Ppc64 -> Some `ppc64
       | _ -> None)
 
-  let sparc n = Bfd.Mach.Sparc.(match of_enum n with
-      | Some Sparc -> Some `sparc
+  let sparc n = Frame_mach.Sparc.(match of_enum n with
+      | Some (Sparc | Unknown) -> Some `sparc
       | Some (V9 | V9a | V9b) -> Some `sparcv9
       | _ -> None)
 
-  let i386 n = Bfd.Mach.I386.(match of_enum n with
-      | Some (I386 | I8086 | I386_intel) -> Some `x86
+  let i386 n = Frame_mach.I386.(match of_enum n with
+      | Some (I386 | I8086 | I386_intel | Unknown) -> Some `x86
       | Some (X86_64 | X86_64_intel) -> Some `x86_64
       | _ -> None)
 
   (** a projection from BFD architectures to BAP.  *)
   let of_bfd arch mach = match arch with
-    | Bfd.Arch.Arm -> arm mach
-    | Bfd.Arch.I386 -> i386 mach
-    | Bfd.Arch.Mips -> mips mach
-    | Bfd.Arch.Powerpc -> ppc mach
-    | Bfd.Arch.Sparc -> sparc mach
+    | Frame_arch.Arm -> arm mach
+    | Frame_arch.I386 -> i386 mach
+    | Frame_arch.Mips -> mips mach
+    | Frame_arch.Powerpc -> ppc mach
+    | Frame_arch.Sparc -> sparc mach
     | _ -> None
 end
 
@@ -101,7 +102,7 @@ let int64 = unpack_signed_64_little_endian
 
 
 let arch ~buf ~pos =
-  match Bfd.Arch.of_enum (int ~buf ~pos) with
+  match Frame_arch.of_enum (int ~buf ~pos) with
   | None -> parse_error "Unknown BFD arch id: %d" (int ~buf ~pos)
   | Some a -> a
 
@@ -150,8 +151,8 @@ let meta_fields meta = Frame.Meta_frame.[
     field Meta.binary_file_stats @@ fstats meta.fstats;
   ]
 
-let meta_frame frame =
-  meta_fields frame |> List.fold ~init:Dict.empty ~f:(fun d f -> f d)
+let meta_frame init frame =
+  meta_fields frame |> List.fold ~init ~f:(fun d f -> f d)
 
 let read_size =
   let len = field_size in
@@ -175,8 +176,11 @@ let read_frames input = fun () ->
     None
 
 let read_meta header ch =
-  if header.version = 1 then Dict.empty
-  else meta_frame @@ read_piqi Frame_piqi.parse_meta_frame ch
+  let dict = match Arch.of_bfd header.bfd_arch header.bfd_mach with
+    | None -> Dict.empty
+    | Some arch -> Dict.set Dict.empty Meta.arch arch in
+  if header.version = 1 then dict
+  else meta_frame dict @@ read_piqi Frame_piqi.parse_meta_frame ch
 
 let create uri =
   let ic = In_channel.create ~binary:true (Uri.path uri) in
