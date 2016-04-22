@@ -52,7 +52,7 @@ module EF : sig
   (* val return : ??? *)
 end = struct
   let addr_of_address arch address =
-    match Option.value_map arch ~default:`r64 ~f:Arch.addr_size with
+    match Option.value_map arch ~default:`r32 ~f:Arch.addr_size with
     | `r32 -> Bitvector.of_int64 ~width:32 address
     | `r64 -> Bitvector.of_int64 ~width:64 address
 

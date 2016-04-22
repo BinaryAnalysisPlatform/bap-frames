@@ -1,2 +1,4 @@
 REC
 PKG ppx_deriving.std
+PKG piqirun
+B ../_build/lib

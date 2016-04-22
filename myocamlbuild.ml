@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 41f0a54e6abba61d7fcf1250a3346c74) *)
+(* DO NOT EDIT (digest: 8c9e103ead53c296dcc5dea1e5d036e0) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -608,14 +608,10 @@ open Ocamlbuild_plugin;;
 let package_default =
   {
      MyOCamlbuildBase.lib_ocaml =
-       [
-          ("bfd", ["lib/bfd"], []);
-          ("bap-frames", ["lib/frames"], []);
-          ("bap-plugin-frames", ["plugin"], [])
-       ];
+       [("bap-frames", ["lib"], []); ("bap-plugin-frames", ["plugin"], [])];
      lib_c = [];
      flags = [];
-     includes = [("plugin", ["lib/frames"]); ("lib/frames", ["lib/bfd"])]
+     includes = [("plugin", ["lib"])]
   }
   ;;
 
@@ -623,7 +619,7 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 627 "myocamlbuild.ml"
+# 623 "myocamlbuild.ml"
 (* OASIS_STOP *)
 let oasis_env =
   BaseEnvLight.load
@@ -634,14 +630,14 @@ let nonempty = function (A s) -> String.length s <> 0 | _ -> true
 let expand s = BaseEnvLight.var_expand s oasis_env;;
 
 rule "piqic: piqi -> .ml"
-  ~prods:["lib/frames/%_piqi.ml"]
-  ~deps:["%.piqi"]
+  ~prods:["lib/%_piqi.ml"]
+  ~deps:["piqi/%.piqi"]
   (fun env _ ->
      Cmd(S (List.filter nonempty [
          A (expand "${piqic}");
          A (expand "${piqic_flags}");
-         A "-C"; A "lib/frames";
-         A "-I"; A "..";
-         A (env "%.piqi")])));;
+         A "-C"; A "lib";
+         A "-I"; A "../piqi";
+         A (env "piqi/%.piqi")])));;
 
 Ocamlbuild_plugin.dispatch dispatch_default;;

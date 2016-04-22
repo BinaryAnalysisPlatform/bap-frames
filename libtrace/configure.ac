@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.64])
-AC_INIT([libtrace], [1.0], [bap-dev@lists.andrew.cmu.edu])
+AC_INIT([libtrace], [1.0], [https://github.com/BinaryAnalysisPlatform/bap-frames])
 AC_CONFIG_SRCDIR([src/trace.container.hpp])
 AC_CONFIG_HEADERS([src/config.h])
 
