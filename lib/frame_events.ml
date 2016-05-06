@@ -52,7 +52,7 @@ module EF : sig
   (* val return : ??? *)
 end = struct
   let addr_of_address arch address =
-    match Option.value_map arch ~default:`r64 ~f:Arch.addr_size with
+    match Option.value_map arch ~default:`r32 ~f:Arch.addr_size with
     | `r32 -> Bitvector.of_int64 ~width:32 address
     | `r64 -> Bitvector.of_int64 ~width:64 address
 
@@ -178,10 +178,13 @@ let of_modload_frame arch frm =
   let open Frame.Modload_frame in
   [EF.modload arch frm.module_name frm.low_address frm.high_address]
 
+
 let of_frame ~context ?arch = function
   | `std_frame frm -> of_std_frame context arch frm
-  | `syscall_frame frm -> of_syscall_frame context arch frm
+  | `syscall_frame frm ->
+    of_syscall_frame context arch frm
   | `exception_frame frm -> of_exception_frame context arch frm
   | `taint_intro_frame frm -> []
   | `modload_frame frm -> of_modload_frame arch frm
   | `key_frame frm -> []
+  | `meta_frame _ -> []

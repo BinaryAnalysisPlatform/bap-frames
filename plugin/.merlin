@@ -1,0 +1,4 @@
+REC
+PKG ppx_deriving.std
+B ../_build/lib/frames
+B ../_build/plugin/

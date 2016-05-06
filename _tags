@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 20d045e1058268e74375bb77116b7fd0)
+# DO NOT EDIT (digest: c47fcdcf848520d4c6201f726377213a)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -15,41 +15,21 @@ true: annot, bin_annot
 "_darcs": -traverse
 "_darcs": not_hygienic
 # Library bap-frames
-"bap-frames.cmxs": use_bap-frames
-<*.ml{,i,y}>: pkg_core_kernel
-<*.ml{,i,y}>: pkg_piqilib
-<*.ml{,i,y}>: pkg_piqirun.ext
-<*.ml{,i,y}>: pkg_piqirun.pb
-<*.ml{,i,y}>: pkg_ppx_jane
+"lib/bap-frames.cmxs": use_bap-frames
+<lib/*.ml{,i,y}>: pkg_bap
+<lib/*.ml{,i,y}>: pkg_bap-traces
+<lib/*.ml{,i,y}>: pkg_core_kernel
+<lib/*.ml{,i,y}>: pkg_piqirun.pb
+<lib/*.ml{,i,y}>: pkg_ppx_deriving.std
+<lib/*.ml{,i,y}>: pkg_ppx_jane
 # Library bap-plugin-frames
 "plugin/bap-plugin-frames.cmxs": use_bap-plugin-frames
 <plugin/*.ml{,i,y}>: pkg_bap
 <plugin/*.ml{,i,y}>: pkg_bap-traces
 <plugin/*.ml{,i,y}>: pkg_core_kernel
-<plugin/*.ml{,i,y}>: pkg_piqilib
-<plugin/*.ml{,i,y}>: pkg_piqirun.ext
 <plugin/*.ml{,i,y}>: pkg_piqirun.pb
+<plugin/*.ml{,i,y}>: pkg_ppx_deriving.std
 <plugin/*.ml{,i,y}>: pkg_ppx_jane
 <plugin/*.ml{,i,y}>: use_bap-frames
-# Executable tracedump
-<test/tracedump.{native,byte}>: pkg_bap
-<test/tracedump.{native,byte}>: pkg_bap-traces
-<test/tracedump.{native,byte}>: pkg_cmdliner
-<test/tracedump.{native,byte}>: pkg_core_kernel
-<test/tracedump.{native,byte}>: pkg_piqilib
-<test/tracedump.{native,byte}>: pkg_piqirun.ext
-<test/tracedump.{native,byte}>: pkg_piqirun.pb
-<test/tracedump.{native,byte}>: pkg_ppx_jane
-<test/tracedump.{native,byte}>: use_bap-frames
-<test/tracedump.{native,byte}>: use_bap-plugin-frames
-<test/*.ml{,i,y}>: pkg_bap
-<test/*.ml{,i,y}>: pkg_bap-traces
-<test/*.ml{,i,y}>: pkg_cmdliner
-<test/*.ml{,i,y}>: pkg_core_kernel
-<test/*.ml{,i,y}>: pkg_piqilib
-<test/*.ml{,i,y}>: pkg_piqirun.ext
-<test/*.ml{,i,y}>: pkg_piqirun.pb
-<test/*.ml{,i,y}>: pkg_ppx_jane
-<test/*.ml{,i,y}>: use_bap-frames
-<test/*.ml{,i,y}>: use_bap-plugin-frames
 # OASIS_STOP
+<libtrace>: -traverse

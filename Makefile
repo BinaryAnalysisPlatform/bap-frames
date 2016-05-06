@@ -9,7 +9,6 @@ doc: setup.data build
 test: setup.data build
 	$(SETUP) -test $(TESTFLAGS)
 
-all: build install
 
 install: setup.data
 	$(SETUP) -install $(INSTALLFLAGS)

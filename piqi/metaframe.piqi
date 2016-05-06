@@ -1,0 +1,39 @@
+% trace meta information
+% since v2
+
+.record [
+  .name meta-frame
+  .field [.name tracer .type tracer]
+  .field [.name target .type target]
+  .field [.name fstats .type fstats]
+  .field [.name user   .type string]
+  .field [.name host   .type string]
+  .field [.name time   .type float]
+]
+
+% description of the trace tool
+.record [
+  .name tracer
+  .field [.name name .type string]
+  .field [.name args .type string .repeated]
+  .field [.name envp .type string .repeated]
+  .field [.name version .type string]
+]
+
+% description of the binary
+.record [
+  .name target
+  .field [.name path .type string]
+  .field [.name args .type string .repeated]
+  .field [.name envp .type string .repeated ]
+  .field [.name md5sum .type binary ]
+]
+
+% file stats
+.record [
+  .name fstats
+  .field [.name size  .type int]
+  .field [.name atime .type float]
+  .field [.name mtime .type float]
+  .field [.name ctime .type float]
+]
