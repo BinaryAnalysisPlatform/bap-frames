@@ -23,7 +23,7 @@ typedef off_t traceoff_t;
 
 namespace SerializedTrace {
 
-  TraceContainerWriter::TraceContainerWriter(std::string filename,
+  TraceContainerWriter::TraceContainerWriter(const std::string& filename,
                                              frame_architecture arch,
                                              uint64_t machine,
                                              uint64_t frames_per_toc_entry_in,
@@ -33,11 +33,41 @@ namespace SerializedTrace {
       arch (arch),
       mach (machine),
       auto_finish (auto_finish_in),
-      is_finished (false)
+      is_finished (false),
+      trace_version(1LL)
   {
     ofs = fopen(filename.c_str(), "wb");
     if (!ofs) { throw (TraceException("Unable to open trace file for writing")); }
     SEEK(ofs, first_frame_offset);
+  }
+
+  TraceContainerWriter::TraceContainerWriter(const std::string& filename,
+                                             const meta_frame& meta,
+                                             frame_architecture arch,
+                                             uint64_t machine,
+                                             uint64_t frames_per_toc_entry_in,
+                                             bool auto_finish_in) throw (TraceException)
+    : num_frames (0),
+      frames_per_toc_entry (frames_per_toc_entry_in),
+      arch (arch),
+      mach (machine),
+      auto_finish (auto_finish_in),
+      is_finished (false),
+      trace_version(2LL)
+  {
+    ofs = fopen(filename.c_str(), "wb");
+    if (!ofs) { throw (TraceException("Unable to open trace file for writing")); }
+    SEEK(ofs, first_frame_offset);
+    std::string meta_data;
+    if (!(meta.SerializeToString(&meta_data))) {
+      throw (TraceException("Unable to serialize meta frame to ostream"));
+    }
+
+    uint64_t meta_size = meta_data.length();
+    WRITE(meta_size);
+    if (fwrite(meta_data.c_str(), 1, meta_size, ofs) != meta_size) {
+      throw (TraceException("Unable to write meta frame to trace file"));
+    }
   }
 
   TraceContainerWriter::~TraceContainerWriter(void) throw () {
@@ -122,7 +152,7 @@ namespace SerializedTrace {
 
     /* Trace version. */
     SEEK(ofs, trace_version_offset);
-    WRITE(out_trace_version);
+    WRITE(trace_version);
 
     /* CPU architecture. */
     SEEK(ofs, frame_arch_offset);

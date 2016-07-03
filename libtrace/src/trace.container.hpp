@@ -21,6 +21,8 @@
  *  <uint64_t frame_machine, 0 for unspecified>
  *  <uint64_t n = number of trace frames>
  *  <uint64_t offset of field m (below)>
+ *  <uint64_t sizeof(meta frame)> (optional, only with trace version = 2)
+ *  <meta frame> (optional, only with trace version = 2)
  *  [ <uint64_t sizeof(trace frame 0)>
  *    <trace frame 0>
  *    ..............
@@ -62,9 +64,9 @@ namespace SerializedTrace {
   const uint64_t toc_offset_offset = 40LL;
   const uint64_t first_frame_offset = 48LL;
 
-  const uint64_t out_trace_version = 1LL;
   const uint64_t lowest_supported_version = 1LL;
-  const uint64_t highest_supported_version = out_trace_version;
+  const uint64_t highest_supported_version = 2LL;
+
 
     class TraceException: public std::exception
     {
@@ -93,7 +95,14 @@ namespace SerializedTrace {
     /** Creates a trace container writer that will output to
         [filename]. An entry will be added to the table of contents
         every [frames_per_toc_entry] entries.*/
-    TraceContainerWriter(std::string filename,
+    TraceContainerWriter(const std::string& filename,
+                         frame_architecture arch = default_arch,
+                         uint64_t machine = default_machine,
+                         uint64_t frames_per_toc_entry = default_frames_per_toc_entry,
+                         bool auto_finish = default_auto_finish) throw (TraceException);
+
+    TraceContainerWriter(const std::string& filename,
+                         const meta_frame& meta,
                          frame_architecture arch = default_arch,
                          uint64_t machine = default_machine,
                          uint64_t frames_per_toc_entry = default_frames_per_toc_entry,
@@ -148,6 +157,8 @@ namespace SerializedTrace {
 
     /** True if [finish()] been called on this writer. */
     bool is_finished;
+
+    uint64_t trace_version;
   };
 
   class TraceContainerReader {
