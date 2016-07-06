@@ -6,6 +6,8 @@
 #endif
 #include "frame_arch.h"
 
+
+
 /**
  * A container for trace frames.  We do not use protobuffers because
  * protobuffers can not stream output (the whole trace would have to
@@ -21,8 +23,6 @@
  *  <uint64_t frame_machine, 0 for unspecified>
  *  <uint64_t n = number of trace frames>
  *  <uint64_t offset of field m (below)>
- *  <uint64_t sizeof(meta frame)> (optional, only with trace version = 2)
- *  <meta frame> (optional, only with trace version = 2)
  *  [ <uint64_t sizeof(trace frame 0)>
  *    <trace frame 0>
  *    ..............
@@ -52,7 +52,6 @@ namespace SerializedTrace {
   const uint64_t magic_number = 7456879624156307493LL;
 
   const uint64_t default_frames_per_toc_entry = 10000;
-  const uint64_t default_auto_finish = false;
   const frame_architecture default_arch = frame_arch_i386;
   const uint64_t default_machine = frame_mach_i386_i386;
 
@@ -98,38 +97,27 @@ namespace SerializedTrace {
     TraceContainerWriter(const std::string& filename,
                          frame_architecture arch = default_arch,
                          uint64_t machine = default_machine,
-                         uint64_t frames_per_toc_entry = default_frames_per_toc_entry,
-                         bool auto_finish = default_auto_finish) throw (TraceException);
+                         uint64_t frames_per_toc_entry = default_frames_per_toc_entry)
+      throw (TraceException);
 
+    // creates a container for the second version of a protocol.
     TraceContainerWriter(const std::string& filename,
                          const meta_frame& meta,
                          frame_architecture arch = default_arch,
                          uint64_t machine = default_machine,
-                         uint64_t frames_per_toc_entry = default_frames_per_toc_entry,
-                         bool auto_finish = default_auto_finish) throw (TraceException);
-
-    /** Destructor that calls finish if auto_finish is true. */
-    ~TraceContainerWriter(void) throw ();
+                         uint64_t frames_per_toc_entry = default_frames_per_toc_entry)
+      throw (TraceException);
 
     /** Add [frame] to the trace. */
-    void add(frame &f) throw (TraceException);
+    void add(const frame &f) throw (TraceException);
 
-    /** Add all frames in container [c] to the trace. */
-    template <typename C>
-    void add(C &c) throw (TraceException) {
-      for (typename C::iterator i = c.begin(); i != c.end(); i++) {
-    	add(*i);
-      }
-    }
+    // closes the trace and underlying file stream. If the stream is
+    // seekable, the output a table of contents and update the header
+    // with an offset to the TOC.
+    void finish();
 
-    /** Finish the trace.  Builds and writes the table of contents to
-     * the file. Closes the file. */
-    void finish(void) throw (TraceException);
+    private:
 
-    /** Returns true iff finish() has not been called on this trace. */
-    bool has_finished(void) throw ();
-
-    protected:
 
     /* Output fstream for trace container file.
      *
@@ -146,19 +134,6 @@ namespace SerializedTrace {
     /** Frames per toc entry. */
     const uint64_t frames_per_toc_entry;
 
-    /** Architecture. */
-    const frame_architecture arch;
-
-    /** Machine type. */
-    const uint64_t mach;
-
-    /** Call [finish()] in destructor if not already done. */
-    bool auto_finish;
-
-    /** True if [finish()] been called on this writer. */
-    bool is_finished;
-
-    uint64_t trace_version;
   };
 
   class TraceContainerReader {
