@@ -23,133 +23,92 @@ typedef off_t traceoff_t;
 
 namespace SerializedTrace {
 
-  TraceContainerWriter::TraceContainerWriter(std::string filename,
+  FILE *open_trace(const std::string& filename,
+                  frame_architecture arch,
+                  uint64_t machine,
+                  uint64_t trace_version) {
+    FILE *ofs = fopen(filename.c_str(), "wb");
+    if (!ofs) throw TraceException("Unable to open trace file for writing");
+    int64_t toc_off = 0LL, toc_num_frames = 0LL;
+
+    WRITE(magic_number);
+    WRITE(trace_version);
+    uint64_t archt = (uint64_t) arch;
+    WRITE(archt);
+    WRITE(machine);
+    WRITE(toc_num_frames);
+    WRITE(toc_off);
+    return ofs;
+  }
+
+
+  TraceContainerWriter::TraceContainerWriter(const std::string& filename,
                                              frame_architecture arch,
                                              uint64_t machine,
-                                             uint64_t frames_per_toc_entry_in,
-                                             bool auto_finish_in) throw (TraceException)
-    : num_frames (0),
-      frames_per_toc_entry (frames_per_toc_entry_in),
-      arch (arch),
-      mach (machine),
-      auto_finish (auto_finish_in),
-      is_finished (false)
-  {
-    ofs = fopen(filename.c_str(), "wb");
-    if (!ofs) { throw (TraceException("Unable to open trace file for writing")); }
-    SEEK(ofs, first_frame_offset);
-  }
+                                             uint64_t frames_per_toc_entry_in)
+    throw (TraceException)
+    : num_frames (0)
+    , frames_per_toc_entry (frames_per_toc_entry_in)
+    , ofs(open_trace(filename,arch,machine,1LL)) {}
 
-  TraceContainerWriter::~TraceContainerWriter(void) throw () {
+  TraceContainerWriter::TraceContainerWriter(const std::string& filename,
+                                             const meta_frame& meta,
+                                             frame_architecture arch,
+                                             uint64_t machine,
+                                             uint64_t frames_per_toc_entry_in)
+    throw (TraceException)
+    : num_frames (0)
+    , frames_per_toc_entry (frames_per_toc_entry_in)
+    , ofs(open_trace(filename,arch,machine,2LL)) {
+    std::string meta_data;
+    if (!(meta.SerializeToString(&meta_data))) {
+      throw TraceException("Unable to serialize meta frame to ostream");
+    }
 
-    /** Call finish if it has not been called already ANd if
-        auto_finish is set. */
-    if (!is_finished && auto_finish) {
-      try {
-        finish();
-      }
-      catch (std::exception const &e) {
-        std::cerr << "Exception " << e.what() << " occured during TraceContainerWriter's auto-finish" << std::endl;
-      }
+    uint64_t meta_size = meta_data.length();
+    WRITE(meta_size);
+    if (fwrite(meta_data.c_str(), 1, meta_size, ofs) != meta_size) {
+      throw (TraceException("Unable to write meta frame to trace file"));
     }
   }
 
-  void TraceContainerWriter::add(frame &f) throw (TraceException) {
-    /* Is is time for a toc entry? */
+  void TraceContainerWriter::add(const frame &f) throw (TraceException) {
     if (num_frames > 0 && (num_frames % frames_per_toc_entry) == 0) {
-      /* Yes.  Add the file offset where we will insert this frame to
-         toc. */
       toc.push_back(TELL(ofs));
     }
-
     num_frames++;
 
-    /* Serialize to string so we can get the length. */
     std::string s;
     if (!(f.SerializeToString(&s))) {
       throw (TraceException("Unable to serialize frame to ostream"));
     }
-
-    /* Write the length before the frame. */
     uint64_t len = s.length();
-    if (len == 0) {
-      throw (TraceException("Attempt to add zero-length frame to trace"));
-    }
     WRITE(len);
-
-    /* Write the frame. */
-    traceoff_t old_offset = TELL(ofs);
-    if (old_offset == -1) {
-      throw (TraceException("Unable to determine the current offset in the trace"));
-    }
-
     if (fwrite(s.c_str(), 1, len, ofs) != len) {
       throw (TraceException("Unable to write frame to trace file"));
     }
-
-    /* Double-check our size. */
-    assert ((uint64_t)old_offset + len == (uint64_t)TELL(ofs));
   }
 
-  void TraceContainerWriter::finish(void) throw (TraceException) {
-    if (is_finished) {
-      throw (TraceException("finish called twice"));
-    }
-
-    /* Save the offset where we will write the toc. */
+  void TraceContainerWriter::finish() {
     uint64_t toc_offset = TELL(ofs);
-    if (toc_offset == -1) {
-      throw (TraceException("Unable to determine the current offset in the trace"));
+    // if we have a positive offset, then the device is seekable, so
+    // we will write the TOC, otherwise we will skip it.
+    if (toc_offset > 0) {
+      assert ((num_frames - 1) / frames_per_toc_entry == toc.size());
+      WRITE(frames_per_toc_entry);
+      for (std::vector<uint64_t>::size_type i = 0; i < toc.size(); i++) {
+        WRITE(toc[i]);
+      }
+      SEEK(ofs, num_trace_frames_offset);
+      WRITE(num_frames);
+      SEEK(ofs, toc_offset_offset);
+      WRITE(toc_offset);
     }
 
-    /* Make sure the toc is the right size. */
-    assert ((num_frames == 0) || ((num_frames - 1) / frames_per_toc_entry) == toc.size());
-
-    /* Write frames per toc entry. */
-    WRITE(frames_per_toc_entry);
-
-    /* Write each offset to the file. */
-    for (std::vector<uint64_t>::size_type i = 0; i < toc.size(); i++) {
-      WRITE(toc[i]);
+    if (fclose(ofs) != 0) {
+      throw TraceException("Error while closing the trace");
     }
-
-    /* Now we need to write the magic number, number of trace frames
-       and the offset of field m at the start of the trace. */
-
-    /* Magic number. */
-    SEEK(ofs, magic_number_offset);
-    WRITE(magic_number);
-
-    /* Trace version. */
-    SEEK(ofs, trace_version_offset);
-    WRITE(out_trace_version);
-
-    /* CPU architecture. */
-    SEEK(ofs, frame_arch_offset);
-    uint64_t archt = (uint64_t) arch;
-    WRITE(archt);
-
-    /* Machine type. */
-    SEEK(ofs, frame_machine_offset);
-    WRITE(mach);
-
-    /* Numer of trace frames */
-    SEEK(ofs, num_trace_frames_offset);
-    WRITE(num_frames);
-
-    /* Offset of toc. */
-    SEEK(ofs, toc_offset_offset);
-    WRITE(toc_offset);
-
-    /* Finally, close the file and mark us as finished. */
-    if (fclose(ofs)) {
-      throw (TraceException("Unable to close trace file"));
-    }
-    is_finished = true;
-  }
-
-  bool TraceContainerWriter::has_finished(void) throw () {
-    return is_finished;
+    ofs = NULL;
   }
 
   TraceContainerReader::TraceContainerReader(std::string filename) throw (TraceException)

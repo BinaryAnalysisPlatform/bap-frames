@@ -1,0 +1,2 @@
+true : package(bap-traces), package(cmdliner)
+<*.native> : package(findlib.dynload)
