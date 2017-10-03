@@ -1,4 +1,6 @@
 REC
-PKG ppx_deriving.std
+PKG ppx_jane
 PKG piqirun
+PKG bap
+
 B ../_build/lib

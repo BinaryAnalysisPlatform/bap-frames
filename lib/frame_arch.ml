@@ -1,3 +1,5 @@
+open Core_kernel.Std
+
 (** Type definitions from BFD library.
 
     Note: this definitions are taken from a correspoind
@@ -96,4 +98,8 @@ type t =
   | Lm32
   | Microblaze
   | Last
-  [@@deriving enum]
+[@@deriving enumerate]
+
+include Frame_enum.Make(struct
+    type nonrec t = t [@@deriving enumerate]
+  end)

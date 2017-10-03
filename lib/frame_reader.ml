@@ -13,7 +13,15 @@ type field =
   | Bfd_mach
   | Frames
   | Toc
-  [@@deriving enum, variants]
+[@@deriving enumerate, variants]
+
+module F = Frame_enum.Make(struct
+    type t = field [@@deriving enumerate]
+  end)
+
+let field_to_enum = F.to_enum
+let field_of_enum = F.of_enum
+let max_field = F.max
 
 type header = {
   magic : int64;

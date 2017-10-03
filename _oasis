@@ -9,10 +9,10 @@ BuildTools:  ocamlbuild
 
 Library "bap-frames"
   Path:            lib/
-  Modules:         Frame_arch, Frame_events, Frame_mach, Frame_piqi, Frame_reader
+  Modules:         Frame_arch, Frame_events, Frame_mach, Frame_piqi, Frame_reader, Frame_enum
   FindlibName:     bap-frames
   BuildTools:      piqi
-  BuildDepends:    bap, bap-traces, core_kernel, piqirun.pb, ppx_jane, ppx_deriving.std
+  BuildDepends:    bap, bap-traces, core_kernel, piqirun.pb, ppx_jane
   CompiledObject:  best
   DataFiles:       ../piqi/*.piqi
 
