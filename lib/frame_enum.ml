@@ -1,21 +1,16 @@
 open Core_kernel.Std
 
-module type Enum = sig
+module type E = sig
   type t [@@deriving enumerate]
+end
+
+module type Enum = sig
+  include E
 
   val to_enum : t -> int
   val of_enum : int -> t option
   val max : int
   val min : int
-end
-
-module type E = sig
-  type t [@@deriving enumerate]
-end
-
-module type Substitute = sig
-  include E
-  val subs : (t * int) list
 end
 
 module type L = sig
@@ -28,19 +23,7 @@ module Make_list(A : E) = struct
   let list = List.mapi all ~f:(fun i x -> i, x)
 end
 
-module Substitute(S : Substitute) = struct
-  include S
-
-  let list =
-    List.map2_exn all
-      (List.init (List.length all) ~f:ident)
-      ~f:(fun t ind ->
-          match List.Assoc.find S.subs ~equal:(=) t with
-          | None -> ind, t
-          | Some ind -> ind, t)
-end
-
-module Make_general(A : L) : Enum with type t := A.t = struct
+module Make_enum(A : L) : Enum with type t := A.t = struct
   include A
 
   let sorted = List.sort ~cmp:(fun (i,_) (j,_) -> compare i j) list
@@ -56,12 +39,29 @@ module Make_general(A : L) : Enum with type t := A.t = struct
   let min = fst @@ List.hd_exn sorted
 end
 
+module type Substitute = sig
+  include E
+  val subs : (t * int) list
+end
+
+module Make_substitution(S : Substitute) = struct
+  include S
+
+  let list =
+    List.map2_exn all
+      (List.init (List.length all) ~f:ident)
+      ~f:(fun t ind ->
+          match List.Assoc.find S.subs ~equal:(=) t with
+          | None -> ind, t
+          | Some ind -> ind, t)
+end
+
 module Make(A : E) = struct
   module L = Make_list(A)
-  include Make_general(L)
+  include Make_enum(L)
 end
 
 module Make_substitute(S : Substitute) = struct
-  module L = Substitute(S)
-  include Make_general(L)
+  module L = Make_substitution(S)
+  include Make_enum(L)
 end
