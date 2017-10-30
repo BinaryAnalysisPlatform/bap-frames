@@ -16,7 +16,9 @@ type field =
 [@@deriving enumerate, variants]
 
 module F = Frame_enum.Make(struct
-    type t = field [@@deriving enumerate]
+    type t = field
+    let rank = Variants_of_field.to_rank
+    let all = all_of_field
   end)
 
 let field_to_enum = F.to_enum

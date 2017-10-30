@@ -1,12 +1,16 @@
 open Core_kernel.Std
 
 module type Enumerated = sig
-  type t [@@deriving enumerate]
+  type t
+  val rank : t -> int
+  val all : t list
 end
 
-(** Replaces [@@deriving enum] interface from ppx_deriving. *)
+(** Replaces [@@deriving enum] interface from ppx_deriving, that
+    treats variants with argument-less constructors as
+    enumerations with an integer value assigned to every constructor. *)
 module type Enumerable = sig
-  include Enumerated
+  type t
 
   val to_enum : t -> int
   val of_enum : int -> t option
@@ -22,7 +26,5 @@ module type Substitution = sig
   val subs : (t * int) list
 end
 
-
-module Make(A : Enumerated)  : Enumerable with type t := A.t
-
+module Make(A : Enumerated) : Enumerable with type t := A.t
 module Make_substitute(S : Substitution) : Enumerable with type t := S.t

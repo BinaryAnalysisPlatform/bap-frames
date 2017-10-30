@@ -2,18 +2,22 @@ open Core_kernel.Std
 open OUnit2
 open Frame_enum
 
-type t = A | B | C | D | E [@@deriving enumerate]
+type t = A | B | C | D | E [@@deriving enumerate, variants]
 
 module E = struct
   include Make(struct
-      type nonrec t = t [@@deriving enumerate]
+      type nonrec t = t
+      let rank = Variants.to_rank
+      let all = all
     end)
 end
 
 module S = struct
   include Make_substitute(struct
-      type nonrec t = t [@@deriving enumerate]
+      type nonrec t = t
       let subs = [B, 42; D, 56;]
+      let rank = Variants.to_rank
+      let all = all
     end)
 end
 

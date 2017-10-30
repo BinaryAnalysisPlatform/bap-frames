@@ -98,8 +98,10 @@ type t =
   | Lm32
   | Microblaze
   | Last
-[@@deriving enumerate]
+[@@deriving enumerate, variants]
 
 include Frame_enum.Make(struct
-    type nonrec t = t [@@deriving enumerate]
+    type nonrec t = t
+    let rank = Variants.to_rank
+    let all = all
   end)
