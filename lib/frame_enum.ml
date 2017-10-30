@@ -15,31 +15,26 @@ end
 
 module type Tabulated = sig
   include Enumerated
-  val list : (int * t) list
+  val alli : (int * t) list
 end
 
 module Tabulate(A : Enumerated) : Tabulated with type t = A.t = struct
   include A
-  let list = List.mapi all ~f:(fun i x -> i, x)
+  let alli = List.mapi all ~f:(fun i x -> i, x)
 end
 
 module Enumerate(A : Tabulated) : Enumerable with type t := A.t = struct
   include A
 
   let to_enum t =
-    fst @@ List.find_exn ~f:(fun (_,x) -> x = t) list
+    fst @@ List.find_exn ~f:(fun (_,x) -> x = t) alli
 
   let of_enum i =
-    List.find ~f:(fun (x,_) -> x = i) list |>
+    List.find ~f:(fun (x,_) -> x = i) alli |>
     Option.value_map ~f:(fun x -> Some (snd x)) ~default:None
 
-  let max = match List.hd (List.rev list) with
-    | None -> 0
-    | Some x -> fst x
-
-  let min = match List.hd list with
-    | None -> 0
-    | Some x -> fst x
+  let max = Option.value_map ~default:0 ~f:fst (List.last alli)
+  let min = Option.value_map ~default:0 ~f:fst (List.hd alli)
 end
 
 module type Substitution = sig
@@ -50,23 +45,19 @@ end
 module Substitute(S : Substitution) = struct
   include S
 
-  let list =
-    List.rev @@
-    fst @@
+  let alli =
+    List.rev @@ fst @@
     List.fold all
-      ~init:([],0)
-      ~f:(fun (acc, ind) t ->
+      ~init:([], 0) ~f:(fun (acc, ind) t ->
           let subs_ind = List.Assoc.find S.subs ~equal:(=) t in
           let ind = Option.value ~default:ind subs_ind in
           (ind, t) :: acc, ind + 1)
 end
 
-module Make(A : Enumerated) = struct
-  module L = Tabulate(A)
-  include Enumerate(L)
+module Make(A : Enumerated) : Enumerable with type t := A.t = struct
+  include Enumerate( Tabulate(A) )
 end
 
-module Make_substitute(S : Substitution) = struct
-  module L = Substitute(S)
-  include Enumerate(L)
+module Make_substitute(S : Substitution) : Enumerable with type t := S.t = struct
+  include Enumerate( Substitute(S) )
 end
