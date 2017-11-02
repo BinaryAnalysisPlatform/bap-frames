@@ -1,12 +1,19 @@
 module I386 = struct
   type t =
     | Unknown
-    | I386          [@value 1]
+    | I386
     | I8086
     | I386_intel
-    | X86_64        [@value 64]
+    | X86_64
     | X86_64_intel
-    [@@deriving enum]
+  [@@deriving enumerate, variants]
+
+  include Frame_enum.Make_substitute(struct
+      type nonrec t = t
+      let subs = [X86_64, 64]
+      let rank = Variants.to_rank
+      let all = all
+    end)
 end
 
 module Arm = struct
@@ -25,33 +32,61 @@ module Arm = struct
     |  Ep9312
     |  Iwmmxt
     |  Iwmmxt2
-    [@@deriving enum]
+  [@@deriving enumerate, variants]
+
+  include Frame_enum.Make(struct
+      type nonrec t = t
+      let rank = Variants.to_rank
+      let all = all
+    end)
+
 end
 
 module Mips = struct
   type t =
-    |  Unknown [@value  0]
-    |  Isa32   [@value 32]
+    |  Unknown
+    |  Isa32
     |  Isa32r2
-    |  Isa64   [@value 64]
+    |  Isa64
     |  Isa64r2
-    [@@deriving enum]
+  [@@deriving enumerate, variants]
+
+  include Frame_enum.Make_substitute(struct
+      type nonrec t = t
+      let subs = [Isa32, 32; Isa64, 64]
+      let rank = Variants.to_rank
+      let all = all
+    end)
 end
 
 module Ppc = struct
   type t =
-    |  Unknown   [@value  0]
-    |  Ppc32     [@value 32]
-    |  Ppc64     [@value 64]
-    [@@deriving enum]
+    |  Unknown
+    |  Ppc32
+    |  Ppc64
+  [@@deriving enumerate, variants]
+
+  include Frame_enum.Make_substitute(struct
+      type nonrec t = t
+      let subs = [Ppc32, 32; Ppc64, 64]
+      let rank = Variants.to_rank
+      let all = all
+    end)
 end
 
 module Sparc = struct
   type t =
-    |  Unknown [@value 0]
-    |  Sparc   [@value 1]
-    |  V9      [@value 7]
+    |  Unknown
+    |  Sparc
+    |  V9
     |  V9a
     |  V9b
-    [@@deriving enum]
+  [@@deriving enumerate, variants]
+
+  include Frame_enum.Make_substitute(struct
+      type nonrec t = t
+      let subs = [V9, 7]
+      let rank = Variants.to_rank
+      let all = all
+    end)
 end
