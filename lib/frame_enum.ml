@@ -1,4 +1,4 @@
-open Core_kernel.Std
+open Core_kernel
 
 module type Enumerated = sig
   type t
@@ -16,7 +16,7 @@ end
 
 let make_values rank xs =
   List.fold ~init:Int.Map.empty
-    ~f:(fun vals x -> Map.add vals ~key:(rank x) ~data:x) xs
+    ~f:(fun vals x -> Map.set vals ~key:(rank x) ~data:x) xs
 
 module type Substitution = sig
   include Enumerated
@@ -34,9 +34,9 @@ module Substitute(S : Substitution) : Enumerated with type t = S.t  = struct
       List.fold xs ~init:(Int.Map.empty,0) ~f:(fun (vals,ind') (ind, x) ->
           match List.find ~f:(fun (old_ind, new_ind) -> old_ind = ind) subs  with
           | None ->
-            Map.add vals ~key:ind ~data:(ind', x), ind' + 1
+            Map.set vals ~key:ind ~data:(ind', x), ind' + 1
           | Some (_, new_ind) ->
-            Map.add vals ~key:ind ~data:(new_ind, x), new_ind + 1) in
+            Map.set vals ~key:ind ~data:(new_ind, x), new_ind + 1) in
     fun x -> fst @@ Map.find_exn values (rank x)
 
   let rank = new_rank
