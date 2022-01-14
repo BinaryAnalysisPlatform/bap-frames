@@ -227,7 +227,7 @@ namespace SerializedTrace {
     }
   }
 
-  std::auto_ptr<frame> TraceContainerReader::get_frame(void) throw (TraceException) {
+  std::unique_ptr<frame> TraceContainerReader::get_frame(void) throw (TraceException) {
     /* Make sure we are in bounds. */
     check_end_of_trace("get_frame() on non-existant frame");
 
@@ -250,7 +250,7 @@ namespace SerializedTrace {
 
     std::string sbuf(buf.get(), frame_len);
 
-    std::auto_ptr<frame> f(new frame);
+    std::unique_ptr<frame> f(new frame);
     if (!(f->ParseFromString(sbuf))) {
       throw (TraceException("Unable to parse from string"));
     }
@@ -259,10 +259,10 @@ namespace SerializedTrace {
     return f;
   }
 
-  std::auto_ptr<std::vector<frame> > TraceContainerReader::get_frames(uint64_t requested_frames) throw (TraceException) {
+  std::unique_ptr<std::vector<frame> > TraceContainerReader::get_frames(uint64_t requested_frames) throw (TraceException) {
     check_end_of_trace("get_frames() on non-existant frame");
 
-    std::auto_ptr<std::vector<frame> > frames(new std::vector<frame>);
+    std::unique_ptr<std::vector<frame> > frames(new std::vector<frame>);
     for (uint64_t i = 0; i < requested_frames && current_frame < num_frames; i++) {
       frames->push_back(*(get_frame()));
     }

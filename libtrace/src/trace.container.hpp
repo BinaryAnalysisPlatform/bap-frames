@@ -170,7 +170,7 @@ namespace SerializedTrace {
 
     /** Return the frame pointed to by the frame pointer. Advances the
         frame pointer by one after. */
-    std::auto_ptr<frame> get_frame(void) throw (TraceException);
+    std::unique_ptr<frame> get_frame(void) throw (TraceException);
 
     /** Return [num_frames] starting at the frame pointed to by the
         frame pointer. If there are not that many frames until the end
@@ -178,7 +178,7 @@ namespace SerializedTrace {
         frame pointer is set one frame after the last frame returned.
         If the last frame returned is the last frame in the trace, the
         frame pointer will point to an invalid frame. */
-    std::auto_ptr<std::vector<frame> > get_frames(uint64_t num_frames) throw (TraceException);
+    std::unique_ptr<std::vector<frame> > get_frames(uint64_t num_frames) throw (TraceException);
 
     /** Return true if frame pointer is at the end of the trace. */
     bool end_of_trace(void) throw ();
