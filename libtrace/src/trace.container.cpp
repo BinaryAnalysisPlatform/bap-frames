@@ -142,6 +142,18 @@ namespace SerializedTrace {
     uint64_t toc_offset;
     READ(toc_offset);
 
+    uint64_t meta_size;
+    READ(meta_size);
+    first_frame_offset = meta_offset + meta_size;
+
+    std::vector<uint8_t> meta_buf(meta_size);
+    if (fread(meta_buf.data(), 1, meta_buf.size(), ifs) != meta_buf.size()) {
+      throw (TraceException("Unable to read meta frame"));
+    }
+    if (!meta.ParseFromArray(meta_buf.data(), meta_buf.size())) {
+      throw (TraceException("Unable to parse meta frame"));
+    }
+
     /* Find the toc. */
     SEEK(ifs, toc_offset);
 

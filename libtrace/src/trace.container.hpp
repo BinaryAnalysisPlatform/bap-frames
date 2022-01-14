@@ -23,6 +23,8 @@
  *  <uint64_t frame_machine, 0 for unspecified>
  *  <uint64_t n = number of trace frames>
  *  <uint64_t offset of field m (below)>
+ *  <uint64_t sizeof(meta frame)>
+ *  <meta frame>
  *  [ <uint64_t sizeof(trace frame 0)>
  *    <trace frame 0>
  *    ..............
@@ -61,9 +63,10 @@ namespace SerializedTrace {
   const uint64_t frame_machine_offset = 24LL;
   const uint64_t num_trace_frames_offset = 32LL;
   const uint64_t toc_offset_offset = 40LL;
-  const uint64_t first_frame_offset = 48LL;
+  const uint64_t meta_size_offset = 48LL;
+  const uint64_t meta_offset = 56LL;
 
-  const uint64_t lowest_supported_version = 1LL;
+  const uint64_t lowest_supported_version = 2LL;
   const uint64_t highest_supported_version = 2LL;
 
 
@@ -180,6 +183,8 @@ namespace SerializedTrace {
     /** Return true if frame pointer is at the end of the trace. */
     bool end_of_trace(void) throw ();
 
+    const meta_frame *get_meta(void) const { return &meta; }
+
   protected:
     /** File to read trace from. */
     FILE *ifs;
@@ -196,11 +201,16 @@ namespace SerializedTrace {
     /** Number of frames per toc entry. */
     uint64_t frames_per_toc_entry;
 
+    /** Base address in file where frames begin */
+    uint64_t first_frame_offset;
+
     /** CPU architecture. */
     frame_architecture arch;
 
     /** Machine type. */
     uint64_t mach;
+
+    meta_frame meta;
 
     /** Current frame number. */
     uint64_t current_frame;
