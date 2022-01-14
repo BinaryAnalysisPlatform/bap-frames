@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 5b609f7614c506a9b5ee564a95aeb514) *)
+(* DO NOT EDIT (digest: 5654b884edf5267e4adea62d7ab38556) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -105,10 +105,7 @@ module OASISString = struct
         ok := false;
       incr str_idx
     done;
-    if !what_idx = String.length what then
-      true
-    else
-      false
+    !what_idx = String.length what
 
 
   let strip_starts_with ~what str =
@@ -131,10 +128,7 @@ module OASISString = struct
         ok := false;
       decr str_idx
     done;
-    if !what_idx = -1 then
-      true
-    else
-      false
+    !what_idx = -1
 
 
   let strip_ends_with ~what str =
@@ -176,6 +170,13 @@ module OASISString = struct
       (uppercase_ascii (String.sub s 0 1)) ^ (String.sub s 1 ((String.length s) - 1))
     else
       s
+
+
+  let split str c =
+    let idx = String.index str c in
+    String.sub str 0 idx,
+    String.sub str (idx + 1) (String.length str - idx - 1)
+
 
 end
 
@@ -440,7 +441,7 @@ module OASISExpr = struct
 end
 
 
-# 443 "myocamlbuild.ml"
+# 444 "myocamlbuild.ml"
 module BaseEnvLight = struct
 (* # 22 "src/base/BaseEnvLight.ml" *)
 
@@ -520,7 +521,7 @@ module BaseEnvLight = struct
 end
 
 
-# 523 "myocamlbuild.ml"
+# 524 "myocamlbuild.ml"
 module MyOCamlbuildFindlib = struct
 (* # 22 "src/plugins/ocamlbuild/MyOCamlbuildFindlib.ml" *)
 
@@ -746,6 +747,9 @@ module MyOCamlbuildBase = struct
 (* # 110 "src/plugins/ocamlbuild/MyOCamlbuildBase.ml" *)
 
 
+  let env_filename = Pathname.basename BaseEnvLight.default_filename
+
+
   let dispatch_combine lst =
     fun e ->
       List.iter
@@ -878,15 +882,19 @@ module MyOCamlbuildBase = struct
 end
 
 
-# 881 "myocamlbuild.ml"
+# 885 "myocamlbuild.ml"
 open Ocamlbuild_plugin;;
 let package_default =
   {
      MyOCamlbuildBase.lib_ocaml =
-       [("bap-frames", ["lib"], []); ("bap-plugin-frames", ["plugin"], [])];
+       [
+          ("bap-frames", ["lib"], []);
+          ("bap-plugin-frames", ["plugin"], []);
+          ("frames-tests", ["test"], [])
+       ];
      lib_c = [];
      flags = [];
-     includes = [("plugin", ["lib"])]
+     includes = [("test", ["lib"]); ("plugin", ["lib"])]
   }
   ;;
 
@@ -894,7 +902,7 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 898 "myocamlbuild.ml"
+# 906 "myocamlbuild.ml"
 (* OASIS_STOP *)
 let oasis_env =
   BaseEnvLight.load

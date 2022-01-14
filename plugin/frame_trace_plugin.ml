@@ -13,7 +13,7 @@ let create_frame_reader uri =
         val mutable tid = None
         method switch id' =
           match tid with
-          | Some id when id = id' -> false
+          | Some id when Int64.equal id id' -> false
           | _ -> tid <- Some id'; true
       end
 
@@ -48,7 +48,9 @@ module Frame_proto : Trace.P = struct
     List.exists ~f:(fun same -> same tag) checkers
 
   let probe uri =
-    Uri.scheme uri = Some "file" &&
+    (match Uri.scheme uri with
+      | Some s -> String.equal s "file"
+      | None -> false) &&
     Filename.check_suffix (Uri.path uri) ".frames"
 end
 
@@ -57,7 +59,7 @@ let build_reader tool uri id =
     let reader = create_frame_reader uri in
     Trace.Reader.{ tool; meta = reader#meta; next = fun () -> reader#next } in
   try Ok (build ()) with
-  | Unix.Unix_error (err, _, _) -> Result.fail (`System_error err)
+  | Caml_unix.Unix_error (err, _, _) -> Result.fail (`System_error err)
   | exn -> Result.fail (`Protocol_error (Error.of_exn  exn))
 
 let () =

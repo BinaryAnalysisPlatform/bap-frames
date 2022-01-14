@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: c47fcdcf848520d4c6201f726377213a)
+# DO NOT EDIT (digest: 3601e9f0e79ce412a23bf65aba46dbe9)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -19,17 +19,38 @@ true: annot, bin_annot
 <lib/*.ml{,i,y}>: pkg_bap
 <lib/*.ml{,i,y}>: pkg_bap-traces
 <lib/*.ml{,i,y}>: pkg_core_kernel
+<lib/*.ml{,i,y}>: pkg_core_kernel.binary_packing
 <lib/*.ml{,i,y}>: pkg_piqirun.pb
-<lib/*.ml{,i,y}>: pkg_ppx_deriving.std
 <lib/*.ml{,i,y}>: pkg_ppx_jane
 # Library bap-plugin-frames
 "plugin/bap-plugin-frames.cmxs": use_bap-plugin-frames
 <plugin/*.ml{,i,y}>: pkg_bap
 <plugin/*.ml{,i,y}>: pkg_bap-traces
 <plugin/*.ml{,i,y}>: pkg_core_kernel
+<plugin/*.ml{,i,y}>: pkg_core_kernel.binary_packing
 <plugin/*.ml{,i,y}>: pkg_piqirun.pb
-<plugin/*.ml{,i,y}>: pkg_ppx_deriving.std
 <plugin/*.ml{,i,y}>: pkg_ppx_jane
 <plugin/*.ml{,i,y}>: use_bap-frames
+# Library frames-tests
+"test/frames-tests.cmxs": use_frames-tests
+# Executable run_frames_tests
+<test/run_frames_tests.{native,byte}>: pkg_bap
+<test/run_frames_tests.{native,byte}>: pkg_bap-traces
+<test/run_frames_tests.{native,byte}>: pkg_core_kernel
+<test/run_frames_tests.{native,byte}>: pkg_core_kernel.binary_packing
+<test/run_frames_tests.{native,byte}>: pkg_oUnit
+<test/run_frames_tests.{native,byte}>: pkg_piqirun.pb
+<test/run_frames_tests.{native,byte}>: pkg_ppx_jane
+<test/run_frames_tests.{native,byte}>: use_bap-frames
+<test/run_frames_tests.{native,byte}>: use_frames-tests
+<test/*.ml{,i,y}>: pkg_bap
+<test/*.ml{,i,y}>: pkg_bap-traces
+<test/*.ml{,i,y}>: pkg_core_kernel
+<test/*.ml{,i,y}>: pkg_core_kernel.binary_packing
+<test/*.ml{,i,y}>: pkg_oUnit
+<test/*.ml{,i,y}>: pkg_piqirun.pb
+<test/*.ml{,i,y}>: pkg_ppx_jane
+<test/*.ml{,i,y}>: use_bap-frames
+<test/*.ml{,i,y}>: use_frames-tests
 # OASIS_STOP
 <libtrace>: -traverse

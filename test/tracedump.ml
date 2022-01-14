@@ -1,4 +1,4 @@
-open Core_kernel.Std
+open Core_kernel
 open Bap.Std
 open Bap_traces.Std
 open Bap_plugins.Std
@@ -19,7 +19,7 @@ let uri =
 
 let print_error = function
   | `Protocol_error err -> Error.pp Format.err_formatter err
-  | `System_error err -> prerr_string @@ Unix.error_message err
+  | `System_error err -> prerr_string @@ Caml_unix.error_message err
   | `No_provider -> prerr_string "No provider for a given URI\n"
   | `Ambiguous_uri -> prerr_string "More than one provider for a given URI\n"
 
