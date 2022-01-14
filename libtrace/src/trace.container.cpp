@@ -12,12 +12,12 @@
 #ifdef _WIN32
 typedef uint64_t traceoff_t;
 #define SEEKNAME _fseeki64
-#define SEEK(f,x) { if (SEEKNAME(f, x, SEEK_SET) != 0) { throw (TraceException("Unable to seek in trace to offset " + x)); } }
+#define SEEK(f,x) { if (SEEKNAME(f, x, SEEK_SET) != 0) { throw (TraceException("Unable to seek in trace to offset " + std::to_string(x))); } }
 #define TELL(f) _ftelli64(f)
 #else
 typedef off_t traceoff_t;
 #define SEEKNAME fseeko
-#define SEEK(f,x) { if (SEEKNAME(f, x, SEEK_SET) != 0) { throw (TraceException("Unable to seek in trace to offset " + x)); } }
+#define SEEK(f,x) { if (SEEKNAME(f, x, SEEK_SET) != 0) { throw (TraceException("Unable to seek in trace to offset " + std::to_string(x))); } }
 #define TELL(f) ftello(f)
 #endif
 
@@ -222,7 +222,7 @@ namespace SerializedTrace {
     uint64_t frame_len;
     READ(frame_len);
     if (frame_len == 0) {
-      throw (TraceException("Read zero-length frame at offset " + TELL(ifs)));
+      throw (TraceException("Read zero-length frame at offset " + std::to_string(TELL(ifs))));
     }
 
     /* We really just want a variable sized array, but MS VC++ doesn't support C99 yet.
