@@ -12,7 +12,7 @@ Library "bap-frames"
   Modules:         Frame_arch, Frame_events, Frame_mach, Frame_piqi, Frame_reader, Frame_enum
   FindlibName:     bap-frames
   BuildTools:      piqi
-  BuildDepends:    bap, bap-traces, core_kernel, piqirun.pb, ppx_jane
+  BuildDepends:    bap, bap-traces, core_kernel, core_kernel.binary_packing, piqirun.pb, ppx_jane
   CompiledObject:  best
   DataFiles:       ../piqi/*.piqi
 
