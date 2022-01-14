@@ -225,18 +225,6 @@ namespace SerializedTrace {
     void check_end_of_trace(std::string msg) throw (TraceException);
 
   };
-
-  /* A minimal smart pointer class for arrays. */
-  template< typename T_ >
-  struct auto_vec{
-    T_* t_;
-    auto_vec( T_* t ): t_( t ) {}
-    ~auto_vec() { delete[] t_; }
-    T_* get() const { return t_; }
-    T_* operator->() const { return get(); }
-    T_& operator*() const { return *get(); }
-  };
-
 };
 
 #endif

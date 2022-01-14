@@ -237,21 +237,15 @@ namespace SerializedTrace {
       throw (TraceException("Read zero-length frame at offset " + std::to_string(TELL(ifs))));
     }
 
-    /* We really just want a variable sized array, but MS VC++ doesn't support C99 yet.
-     *
-     * http://stackoverflow.com/questions/5246900/enabling-vlasvariable-length-arrays-in-ms-visual-c
-     */
-    auto_vec<char> buf ( new char[frame_len] );
+    std::vector<uint8_t> buf(frame_len);
 
     /* Read the frame into buf. */
-    if (fread(buf.get(), 1, frame_len, ifs) != frame_len) {
+    if (fread(buf.data(), 1, frame_len, ifs) != frame_len) {
       throw (TraceException("Unable to read frame from trace"));
     }
 
-    std::string sbuf(buf.get(), frame_len);
-
     std::unique_ptr<frame> f(new frame);
-    if (!(f->ParseFromString(sbuf))) {
+    if (!(f->ParseFromArray(buf.data(), buf.size()))) {
       throw (TraceException("Unable to parse from string"));
     }
     current_frame++;
