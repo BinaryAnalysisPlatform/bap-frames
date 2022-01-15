@@ -78,9 +78,9 @@ namespace SerializedTrace {
         : msg (s)
         { }
 
-      ~TraceException(void) throw () { }
+      ~TraceException(void) noexcept { }
 
-      virtual const char* what() const throw()
+      virtual const char* what() const noexcept
         {
           return msg.c_str();
         }
@@ -100,19 +100,17 @@ namespace SerializedTrace {
     TraceContainerWriter(const std::string& filename,
                          frame_architecture arch = default_arch,
                          uint64_t machine = default_machine,
-                         uint64_t frames_per_toc_entry = default_frames_per_toc_entry)
-      throw (TraceException);
+                         uint64_t frames_per_toc_entry = default_frames_per_toc_entry);
 
     // creates a container for the second version of a protocol.
     TraceContainerWriter(const std::string& filename,
                          const meta_frame& meta,
                          frame_architecture arch = default_arch,
                          uint64_t machine = default_machine,
-                         uint64_t frames_per_toc_entry = default_frames_per_toc_entry)
-      throw (TraceException);
+                         uint64_t frames_per_toc_entry = default_frames_per_toc_entry);
 
     /** Add [frame] to the trace. */
-    void add(const frame &f) throw (TraceException);
+    void add(const frame &f);
 
     // closes the trace and underlying file stream. If the stream is
     // seekable, the output a table of contents and update the header
@@ -144,33 +142,33 @@ namespace SerializedTrace {
   public:
 
     /** Creates a trace container reader that reads from [filename]. */
-    TraceContainerReader(std::string filename) throw (TraceException);
+    TraceContainerReader(std::string filename);
 
     /** Destructor. */
-    ~TraceContainerReader(void) throw ();
+    ~TraceContainerReader(void) noexcept;
 
     /** Returns the number of frames in the trace. */
-    uint64_t get_num_frames(void) throw ();
+    uint64_t get_num_frames(void) noexcept;
 
     /** Returns the number of frames per toc entry. */
-    uint64_t get_frames_per_toc_entry(void) throw ();
+    uint64_t get_frames_per_toc_entry(void) noexcept;
 
     /** Returns the architecture of the trace. */
-    frame_architecture get_arch(void) throw ();
+    frame_architecture get_arch(void) noexcept;
 
     /** Returns the machine type (sub-architecture) of the trace. */
-    uint64_t get_machine(void) throw ();
+    uint64_t get_machine(void) noexcept;
 
     /** Returns trace version. */
-    uint64_t get_trace_version(void) throw ();
+    uint64_t get_trace_version(void) noexcept;
 
     /** Seek to frame number [frame_number]. The frame is numbered
      * 0. */
-    void seek(uint64_t frame_number) throw (TraceException);;
+    void seek(uint64_t frame_number);;
 
     /** Return the frame pointed to by the frame pointer. Advances the
         frame pointer by one after. */
-    std::unique_ptr<frame> get_frame(void) throw (TraceException);
+    std::unique_ptr<frame> get_frame(void);
 
     /** Return [num_frames] starting at the frame pointed to by the
         frame pointer. If there are not that many frames until the end
@@ -178,10 +176,10 @@ namespace SerializedTrace {
         frame pointer is set one frame after the last frame returned.
         If the last frame returned is the last frame in the trace, the
         frame pointer will point to an invalid frame. */
-    std::unique_ptr<std::vector<frame> > get_frames(uint64_t num_frames) throw (TraceException);
+    std::unique_ptr<std::vector<frame> > get_frames(uint64_t num_frames);
 
     /** Return true if frame pointer is at the end of the trace. */
-    bool end_of_trace(void) throw ();
+    bool end_of_trace(void) noexcept;
 
     const meta_frame *get_meta(void) const { return &meta; }
 
@@ -216,13 +214,13 @@ namespace SerializedTrace {
     uint64_t current_frame;
 
     /** Return true if [frame_num] is at the end of the trace. */
-    bool end_of_trace_num(uint64_t frame_num) throw ();
+    bool end_of_trace_num(uint64_t frame_num) noexcept;
 
     /** Raise exception if [frame_num] is at the end of the trace. */
-    void check_end_of_trace_num(uint64_t frame_num, std::string msg) throw (TraceException);
+    void check_end_of_trace_num(uint64_t frame_num, std::string msg);
 
     /** Raise exception if frame pointer is at the end of the trace. */
-    void check_end_of_trace(std::string msg) throw (TraceException);
+    void check_end_of_trace(std::string msg);
 
   };
 };

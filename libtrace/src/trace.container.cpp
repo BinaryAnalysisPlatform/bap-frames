@@ -46,7 +46,6 @@ namespace SerializedTrace {
                                              frame_architecture arch,
                                              uint64_t machine,
                                              uint64_t frames_per_toc_entry_in)
-    throw (TraceException)
     : num_frames (0)
     , frames_per_toc_entry (frames_per_toc_entry_in)
     , ofs(open_trace(filename,arch,machine,1LL)) {}
@@ -56,7 +55,6 @@ namespace SerializedTrace {
                                              frame_architecture arch,
                                              uint64_t machine,
                                              uint64_t frames_per_toc_entry_in)
-    throw (TraceException)
     : num_frames (0)
     , frames_per_toc_entry (frames_per_toc_entry_in)
     , ofs(open_trace(filename,arch,machine,2LL)) {
@@ -72,7 +70,7 @@ namespace SerializedTrace {
     }
   }
 
-  void TraceContainerWriter::add(const frame &f) throw (TraceException) {
+  void TraceContainerWriter::add(const frame &f) {
     if (num_frames > 0 && (num_frames % frames_per_toc_entry) == 0) {
       toc.push_back(TELL(ofs));
     }
@@ -111,7 +109,7 @@ namespace SerializedTrace {
     ofs = NULL;
   }
 
-  TraceContainerReader::TraceContainerReader(std::string filename) throw (TraceException)
+  TraceContainerReader::TraceContainerReader(std::string filename)
   {
     ifs = fopen(filename.c_str(), "rb");
     if (!ifs) { throw (TraceException("Unable to open trace for reading")); }
@@ -178,31 +176,31 @@ namespace SerializedTrace {
     seek(0);
   }
 
-  TraceContainerReader::~TraceContainerReader(void) throw () {
+  TraceContainerReader::~TraceContainerReader(void) noexcept {
     /* Nothing yet. */
   }
 
-  uint64_t TraceContainerReader::get_num_frames(void) throw () {
+  uint64_t TraceContainerReader::get_num_frames(void) noexcept {
     return num_frames;
   }
 
-  uint64_t TraceContainerReader::get_frames_per_toc_entry(void) throw () {
+  uint64_t TraceContainerReader::get_frames_per_toc_entry(void) noexcept {
     return frames_per_toc_entry;
   }
 
-  frame_architecture TraceContainerReader::get_arch(void) throw () {
+  frame_architecture TraceContainerReader::get_arch(void) noexcept {
     return arch;
   }
 
-  uint64_t TraceContainerReader::get_machine(void) throw () {
+  uint64_t TraceContainerReader::get_machine(void) noexcept {
     return mach;
   }
 
-  uint64_t TraceContainerReader::get_trace_version(void) throw () {
+  uint64_t TraceContainerReader::get_trace_version(void) noexcept {
     return trace_version;
   }
 
-  void TraceContainerReader::seek(uint64_t frame_number) throw (TraceException) {
+  void TraceContainerReader::seek(uint64_t frame_number) {
     /* First, make sure the frame is in range. */
     check_end_of_trace_num(frame_number, "seek() to non-existant frame");
 
@@ -227,7 +225,7 @@ namespace SerializedTrace {
     }
   }
 
-  std::unique_ptr<frame> TraceContainerReader::get_frame(void) throw (TraceException) {
+  std::unique_ptr<frame> TraceContainerReader::get_frame(void) {
     /* Make sure we are in bounds. */
     check_end_of_trace("get_frame() on non-existant frame");
 
@@ -253,7 +251,7 @@ namespace SerializedTrace {
     return f;
   }
 
-  std::unique_ptr<std::vector<frame> > TraceContainerReader::get_frames(uint64_t requested_frames) throw (TraceException) {
+  std::unique_ptr<std::vector<frame> > TraceContainerReader::get_frames(uint64_t requested_frames) {
     check_end_of_trace("get_frames() on non-existant frame");
 
     std::unique_ptr<std::vector<frame> > frames(new std::vector<frame>);
@@ -264,11 +262,11 @@ namespace SerializedTrace {
     return frames;
   }
 
-  bool TraceContainerReader::end_of_trace(void) throw () {
+  bool TraceContainerReader::end_of_trace(void) noexcept {
     return end_of_trace_num(current_frame);
   }
 
-  bool TraceContainerReader::end_of_trace_num(uint64_t frame_num) throw () {
+  bool TraceContainerReader::end_of_trace_num(uint64_t frame_num) noexcept {
     if (frame_num + 1 > num_frames) {
       return true;
     } else {
@@ -276,13 +274,13 @@ namespace SerializedTrace {
     }
   }
 
-  void TraceContainerReader::check_end_of_trace_num(uint64_t frame_num, std::string msg) throw (TraceException) {
+  void TraceContainerReader::check_end_of_trace_num(uint64_t frame_num, std::string msg) {
     if (end_of_trace_num(frame_num)) {
       throw (TraceException(msg));
     }
   }
 
-    void TraceContainerReader::check_end_of_trace(std::string msg) throw (TraceException) {
+    void TraceContainerReader::check_end_of_trace(std::string msg) {
       return check_end_of_trace_num(current_frame, msg);
     }
 };
