@@ -8,9 +8,9 @@
 /*.bak
 /*.byte
 /*.docdir
-/*.native
+*.native
 /Makefile
-/_build/
+_build/
 /_tags
 /configure
 /doc
