@@ -18,6 +18,8 @@ void print_all(const char *f) {
 
   TraceContainerReader t(f);
 
+  std::cout << t.get_meta()->DebugString() << std::endl;
+
   while (!t.end_of_trace()) {
     ctr++;
     print(*(t.get_frame()));

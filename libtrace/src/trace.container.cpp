@@ -12,12 +12,12 @@
 #ifdef _WIN32
 typedef uint64_t traceoff_t;
 #define SEEKNAME _fseeki64
-#define SEEK(f,x) { if (SEEKNAME(f, x, SEEK_SET) != 0) { throw (TraceException("Unable to seek in trace to offset " + x)); } }
+#define SEEK(f,x) { if (SEEKNAME(f, x, SEEK_SET) != 0) { throw (TraceException("Unable to seek in trace to offset " + std::to_string(x))); } }
 #define TELL(f) _ftelli64(f)
 #else
 typedef off_t traceoff_t;
 #define SEEKNAME fseeko
-#define SEEK(f,x) { if (SEEKNAME(f, x, SEEK_SET) != 0) { throw (TraceException("Unable to seek in trace to offset " + x)); } }
+#define SEEK(f,x) { if (SEEKNAME(f, x, SEEK_SET) != 0) { throw (TraceException("Unable to seek in trace to offset " + std::to_string(x))); } }
 #define TELL(f) ftello(f)
 #endif
 
@@ -46,7 +46,6 @@ namespace SerializedTrace {
                                              frame_architecture arch,
                                              uint64_t machine,
                                              uint64_t frames_per_toc_entry_in)
-    throw (TraceException)
     : num_frames (0)
     , frames_per_toc_entry (frames_per_toc_entry_in)
     , ofs(open_trace(filename,arch,machine,1LL)) {}
@@ -56,7 +55,6 @@ namespace SerializedTrace {
                                              frame_architecture arch,
                                              uint64_t machine,
                                              uint64_t frames_per_toc_entry_in)
-    throw (TraceException)
     : num_frames (0)
     , frames_per_toc_entry (frames_per_toc_entry_in)
     , ofs(open_trace(filename,arch,machine,2LL)) {
@@ -72,7 +70,7 @@ namespace SerializedTrace {
     }
   }
 
-  void TraceContainerWriter::add(const frame &f) throw (TraceException) {
+  void TraceContainerWriter::add(const frame &f) {
     if (num_frames > 0 && (num_frames % frames_per_toc_entry) == 0) {
       toc.push_back(TELL(ofs));
     }
@@ -111,7 +109,7 @@ namespace SerializedTrace {
     ofs = NULL;
   }
 
-  TraceContainerReader::TraceContainerReader(std::string filename) throw (TraceException)
+  TraceContainerReader::TraceContainerReader(std::string filename)
   {
     ifs = fopen(filename.c_str(), "rb");
     if (!ifs) { throw (TraceException("Unable to open trace for reading")); }
@@ -142,6 +140,18 @@ namespace SerializedTrace {
     uint64_t toc_offset;
     READ(toc_offset);
 
+    uint64_t meta_size;
+    READ(meta_size);
+    first_frame_offset = meta_offset + meta_size;
+
+    std::vector<uint8_t> meta_buf(meta_size);
+    if (fread(meta_buf.data(), 1, meta_buf.size(), ifs) != meta_buf.size()) {
+      throw (TraceException("Unable to read meta frame"));
+    }
+    if (!meta.ParseFromArray(meta_buf.data(), meta_buf.size())) {
+      throw (TraceException("Unable to parse meta frame"));
+    }
+
     /* Find the toc. */
     SEEK(ifs, toc_offset);
 
@@ -166,31 +176,31 @@ namespace SerializedTrace {
     seek(0);
   }
 
-  TraceContainerReader::~TraceContainerReader(void) throw () {
+  TraceContainerReader::~TraceContainerReader(void) noexcept {
     /* Nothing yet. */
   }
 
-  uint64_t TraceContainerReader::get_num_frames(void) throw () {
+  uint64_t TraceContainerReader::get_num_frames(void) noexcept {
     return num_frames;
   }
 
-  uint64_t TraceContainerReader::get_frames_per_toc_entry(void) throw () {
+  uint64_t TraceContainerReader::get_frames_per_toc_entry(void) noexcept {
     return frames_per_toc_entry;
   }
 
-  frame_architecture TraceContainerReader::get_arch(void) throw () {
+  frame_architecture TraceContainerReader::get_arch(void) noexcept {
     return arch;
   }
 
-  uint64_t TraceContainerReader::get_machine(void) throw () {
+  uint64_t TraceContainerReader::get_machine(void) noexcept {
     return mach;
   }
 
-  uint64_t TraceContainerReader::get_trace_version(void) throw () {
+  uint64_t TraceContainerReader::get_trace_version(void) noexcept {
     return trace_version;
   }
 
-  void TraceContainerReader::seek(uint64_t frame_number) throw (TraceException) {
+  void TraceContainerReader::seek(uint64_t frame_number) {
     /* First, make sure the frame is in range. */
     check_end_of_trace_num(frame_number, "seek() to non-existant frame");
 
@@ -215,31 +225,25 @@ namespace SerializedTrace {
     }
   }
 
-  std::auto_ptr<frame> TraceContainerReader::get_frame(void) throw (TraceException) {
+  std::unique_ptr<frame> TraceContainerReader::get_frame(void) {
     /* Make sure we are in bounds. */
     check_end_of_trace("get_frame() on non-existant frame");
 
     uint64_t frame_len;
     READ(frame_len);
     if (frame_len == 0) {
-      throw (TraceException("Read zero-length frame at offset " + TELL(ifs)));
+      throw (TraceException("Read zero-length frame at offset " + std::to_string(TELL(ifs))));
     }
 
-    /* We really just want a variable sized array, but MS VC++ doesn't support C99 yet.
-     *
-     * http://stackoverflow.com/questions/5246900/enabling-vlasvariable-length-arrays-in-ms-visual-c
-     */
-    auto_vec<char> buf ( new char[frame_len] );
+    std::vector<uint8_t> buf(frame_len);
 
     /* Read the frame into buf. */
-    if (fread(buf.get(), 1, frame_len, ifs) != frame_len) {
+    if (fread(buf.data(), 1, frame_len, ifs) != frame_len) {
       throw (TraceException("Unable to read frame from trace"));
     }
 
-    std::string sbuf(buf.get(), frame_len);
-
-    std::auto_ptr<frame> f(new frame);
-    if (!(f->ParseFromString(sbuf))) {
+    std::unique_ptr<frame> f(new frame);
+    if (!(f->ParseFromArray(buf.data(), buf.size()))) {
       throw (TraceException("Unable to parse from string"));
     }
     current_frame++;
@@ -247,10 +251,10 @@ namespace SerializedTrace {
     return f;
   }
 
-  std::auto_ptr<std::vector<frame> > TraceContainerReader::get_frames(uint64_t requested_frames) throw (TraceException) {
+  std::unique_ptr<std::vector<frame> > TraceContainerReader::get_frames(uint64_t requested_frames) {
     check_end_of_trace("get_frames() on non-existant frame");
 
-    std::auto_ptr<std::vector<frame> > frames(new std::vector<frame>);
+    std::unique_ptr<std::vector<frame> > frames(new std::vector<frame>);
     for (uint64_t i = 0; i < requested_frames && current_frame < num_frames; i++) {
       frames->push_back(*(get_frame()));
     }
@@ -258,11 +262,11 @@ namespace SerializedTrace {
     return frames;
   }
 
-  bool TraceContainerReader::end_of_trace(void) throw () {
+  bool TraceContainerReader::end_of_trace(void) noexcept {
     return end_of_trace_num(current_frame);
   }
 
-  bool TraceContainerReader::end_of_trace_num(uint64_t frame_num) throw () {
+  bool TraceContainerReader::end_of_trace_num(uint64_t frame_num) noexcept {
     if (frame_num + 1 > num_frames) {
       return true;
     } else {
@@ -270,13 +274,13 @@ namespace SerializedTrace {
     }
   }
 
-  void TraceContainerReader::check_end_of_trace_num(uint64_t frame_num, std::string msg) throw (TraceException) {
+  void TraceContainerReader::check_end_of_trace_num(uint64_t frame_num, std::string msg) {
     if (end_of_trace_num(frame_num)) {
       throw (TraceException(msg));
     }
   }
 
-    void TraceContainerReader::check_end_of_trace(std::string msg) throw (TraceException) {
+    void TraceContainerReader::check_end_of_trace(std::string msg) {
       return check_end_of_trace_num(current_frame, msg);
     }
 };
