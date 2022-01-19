@@ -381,6 +381,7 @@ enum frame_architecture
   frame_arch_lm32,      /* Lattice Mico32 */
 #define frame_mach_lm32      1
   frame_arch_microblaze,/* Xilinx MicroBlaze. */
+  frame_arch_6502,/* MOS Technology 6502. */
   frame_arch_last
   };
 
