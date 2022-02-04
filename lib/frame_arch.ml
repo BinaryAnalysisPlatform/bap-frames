@@ -97,6 +97,7 @@ type t =
   | Z80
   | Lm32
   | Microblaze
+  | M6502
   | Last
 [@@deriving enumerate, variants]
 
