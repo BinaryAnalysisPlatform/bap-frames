@@ -41,15 +41,6 @@ namespace SerializedTrace {
     return ofs;
   }
 
-
-  TraceContainerWriter::TraceContainerWriter(const std::string& filename,
-                                             frame_architecture arch,
-                                             uint64_t machine,
-                                             uint64_t frames_per_toc_entry_in)
-    : num_frames (0)
-    , frames_per_toc_entry (frames_per_toc_entry_in)
-    , ofs(open_trace(filename,arch,machine,1LL)) {}
-
   TraceContainerWriter::TraceContainerWriter(const std::string& filename,
                                              const meta_frame& meta,
                                              frame_architecture arch,
@@ -57,7 +48,7 @@ namespace SerializedTrace {
                                              uint64_t frames_per_toc_entry_in)
     : num_frames (0)
     , frames_per_toc_entry (frames_per_toc_entry_in)
-    , ofs(open_trace(filename,arch,machine,2LL)) {
+    , ofs(open_trace(filename,arch,machine,3LL)) {
     std::string meta_data;
     if (!(meta.SerializeToString(&meta_data))) {
       throw TraceException("Unable to serialize meta frame to ostream");

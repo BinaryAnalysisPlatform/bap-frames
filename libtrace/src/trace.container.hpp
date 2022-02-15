@@ -67,7 +67,7 @@ namespace SerializedTrace {
   const uint64_t meta_offset = 56LL;
 
   const uint64_t lowest_supported_version = 2LL;
-  const uint64_t highest_supported_version = 2LL;
+  const uint64_t highest_supported_version = 3LL;
 
 
     class TraceException: public std::exception
@@ -97,12 +97,6 @@ namespace SerializedTrace {
     /** Creates a trace container writer that will output to
         [filename]. An entry will be added to the table of contents
         every [frames_per_toc_entry] entries.*/
-    TraceContainerWriter(const std::string& filename,
-                         frame_architecture arch = default_arch,
-                         uint64_t machine = default_machine,
-                         uint64_t frames_per_toc_entry = default_frames_per_toc_entry);
-
-    // creates a container for the second version of a protocol.
     TraceContainerWriter(const std::string& filename,
                          const meta_frame& meta,
                          frame_architecture arch = default_arch,
