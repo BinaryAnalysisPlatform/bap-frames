@@ -98,6 +98,7 @@ type t =
   | Lm32
   | Microblaze
   | M6502
+  | AArch64
   | Last
 [@@deriving enumerate, variants]
 

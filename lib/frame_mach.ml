@@ -90,3 +90,15 @@ module Sparc = struct
       let all = all
     end)
 end
+
+module AArch64 = struct
+  type t =
+    |  Unknown
+  [@@deriving enumerate, variants]
+
+  include Frame_enum.Make(struct
+      type nonrec t = t
+      let rank = Variants.to_rank
+      let all = all
+    end)
+end
