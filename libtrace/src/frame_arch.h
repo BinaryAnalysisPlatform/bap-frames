@@ -382,6 +382,8 @@ enum frame_architecture
 #define frame_mach_lm32      1
   frame_arch_microblaze,/* Xilinx MicroBlaze. */
   frame_arch_6502,/* MOS Technology 6502. */
+  frame_arch_aarch64,   /* AArch64.  */
+#define frame_mach_aarch64 0
   frame_arch_last
   };
 

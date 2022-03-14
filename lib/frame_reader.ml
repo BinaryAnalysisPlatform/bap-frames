@@ -89,6 +89,10 @@ module Arch = struct
       | Some (X86_64 | X86_64_intel) -> Some `x86_64
       | _ -> None)
 
+  let aarch64 n = Frame_mach.AArch64.(match of_enum n with
+      | Some (Unknown) -> Some `aarch64
+      | _ -> None)
+
   (** a projection from BFD architectures to BAP.  *)
   let of_bfd arch mach = match arch with
     | Frame_arch.Arm -> arm mach
@@ -96,6 +100,7 @@ module Arch = struct
     | Frame_arch.Mips -> mips mach
     | Frame_arch.Powerpc -> ppc mach
     | Frame_arch.Sparc -> sparc mach
+    | Frame_arch.AArch64 -> aarch64 mach
     | _ -> None
 end
 
