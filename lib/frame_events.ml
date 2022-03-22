@@ -118,7 +118,7 @@ end = struct
     Value.create modload
 
   let mode (fe : string) =
-    Value.create mode (Mode.read fe) (* TODO: catch failure if string is not in enum? *)
+    Value.create mode (try Mode.read fe with _exn -> Mode.unknown)
 end
 
 let of_new_frame context arch address thread_id =
