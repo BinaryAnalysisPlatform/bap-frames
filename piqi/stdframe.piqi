@@ -39,4 +39,12 @@
                .code 5
                .optional
         ]
+
+        % Per-frame (CPU) mode, for example for indicating thumb mode in Arm
+        .field [
+               .name mode
+               .type string
+               .code 6
+               .optional
+        ]
 ]

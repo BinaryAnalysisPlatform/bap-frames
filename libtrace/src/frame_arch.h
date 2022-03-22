@@ -387,4 +387,11 @@ enum frame_architecture
   frame_arch_last
   };
 
+/**
+ * Optional per-frame information indicating execution in a specific (CPU) mode.
+ * These are the string representations of possible Bap_traces.Mode.t values.
+ */
+#define FRAME_MODE_ARM_A32 "arm:a32"
+#define FRAME_MODE_ARM_T32 "arm:t32"
+
 #endif

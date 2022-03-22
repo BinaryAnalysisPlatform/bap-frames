@@ -48,6 +48,8 @@ module EF : sig
   val modload : arch option ->
     string -> Frame.address -> Frame.address -> Trace.event
 
+  val mode : string -> Trace.event
+
   (* val call : ??? *)
   (* val return : ??? *)
 end = struct
@@ -114,6 +116,9 @@ end = struct
       ~low:(addr_of_address arch low)
       ~high:(addr_of_address arch high) |>
     Value.create modload
+
+  let mode (fe : string) =
+    Value.create mode (try Mode.read fe with _exn -> Mode.unknown)
 end
 
 let of_new_frame context arch address thread_id =
@@ -152,9 +157,12 @@ let of_operand_info arch oi =
 let of_operand_value_list arch ovl =
   List.concat @@ List.map ~f:(of_operand_info arch) ovl
 
+let of_mode mode = [EF.mode mode]
+
 let of_std_frame context arch frm =
   let open Frame.Std_frame in
   List.concat [of_new_frame context arch frm.address frm.thread_id;
+               Option.value_map frm.mode ~default:[] ~f:(of_mode);
                [EF.code_exec arch frm.address frm.rawbytes];
                of_operand_value_list arch frm.operand_pre_list;
                Option.value_map frm.operand_post_list ~default:[]
