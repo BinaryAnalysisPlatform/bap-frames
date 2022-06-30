@@ -8,15 +8,17 @@ pkginclude_HEADERS = trace.container.hpp frame_arch.h frame.piqi.pb.h config.h
 PIQI = piqi
 PROTOC = protoc
 PIQIFILE = ../../piqi/frame.piqi
+PIQIFILEC = frame.piqi.pb.cc frame.piqi.pb.h
 
-frame.piqi.pb.cc frame.piqi.pb.h: frame.piqi.proto
+$(PIQIFILEC): frame.piqi.proto
 	$(PROTOC) $< --cpp_out=.
 
 frame.piqi.proto: $(PIQIFILE)
 	$(PIQI) to-proto $< -o $@
 
-libtrace_a_SOURCES = frame.piqi.pb.h frame.piqi.pb.cc trace.container.cpp
+BUILT_SOURCES = $(PIQIFILEC)
 
+libtrace_a_SOURCES = $(PIQIFILEC) trace.container.cpp
 utils_LDADD = libtrace.a -lprotobuf -lpthread
 
 bin_PROGRAMS = readtrace copytrace
