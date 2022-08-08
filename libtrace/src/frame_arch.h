@@ -394,4 +394,7 @@ enum frame_architecture
 #define FRAME_MODE_ARM_A32 "arm:a32"
 #define FRAME_MODE_ARM_T32 "arm:t32"
 
+#define FRAME_MODE_PPC32 "ppc:ppc"
+#define FRAME_MODE_PPC64 "ppc:ppc64"
+
 #endif
