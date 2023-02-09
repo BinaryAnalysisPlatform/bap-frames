@@ -384,6 +384,7 @@ enum frame_architecture
   frame_arch_6502,/* MOS Technology 6502. */
   frame_arch_aarch64,   /* AArch64.  */
 #define frame_mach_aarch64 0
+  frame_arch_8051,/* Intel 8051. */
   frame_arch_last
   };
 
