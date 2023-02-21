@@ -99,6 +99,7 @@ type t =
   | Microblaze
   | M6502
   | AArch64
+  | I8051
   | Last
 [@@deriving enumerate, variants]
 
