@@ -385,6 +385,7 @@ enum frame_architecture
   frame_arch_aarch64,   /* AArch64.  */
 #define frame_mach_aarch64 0
   frame_arch_8051,/* Intel 8051. */
+  frame_arch_sm83, /* Sharp SM83 (Game Boy) */
   frame_arch_last
   };
 

@@ -100,6 +100,7 @@ type t =
   | M6502
   | AArch64
   | I8051
+  | SM83
   | Last
 [@@deriving enumerate, variants]
 
