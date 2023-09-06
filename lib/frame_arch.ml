@@ -100,8 +100,8 @@ type t =
   | M6502
   | AArch64
   | I8051
-  | Hexagon
   | SM83
+  | Hexagon
   | Last
 [@@deriving enumerate, variants]
 

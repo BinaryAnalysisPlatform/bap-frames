@@ -386,6 +386,42 @@ enum frame_architecture
 #define frame_mach_aarch64 0
   frame_arch_8051,/* Intel 8051. */
   frame_arch_sm83, /* Sharp SM83 (Game Boy) */
+  frame_arch_hexagon, /* Qualcomm DSP architecture Hexagon */
+#define frame_mach_hexagon_unknown 0
+#define frame_mach_hexagon_V1 1
+#define frame_mach_hexagon_V2 2
+#define frame_mach_hexagon_V3_gen1 31
+#define frame_mach_hexagon_V3_gen2 32
+#define frame_mach_hexagon_V4 4
+#define frame_mach_hexagon_V4M 41
+#define frame_mach_hexagon_V4C 42
+#define frame_mach_hexagon_V4L 43
+#define frame_mach_hexagon_V5 5
+#define frame_mach_hexagon_V5A 51
+#define frame_mach_hexagon_V5H 52
+#define frame_mach_hexagon_536 536
+#define frame_mach_hexagon_V50 50
+#define frame_mach_hexagon_546 546
+#define frame_mach_hexagon_546 546
+#define frame_mach_hexagon_V56 56
+#define frame_mach_hexagon_V6 6
+#define frame_mach_hexagon_642 642
+#define frame_mach_hexagon_680 680
+#define frame_mach_hexagon_682 682
+#define frame_mach_hexagon_683 683
+#define frame_mach_hexagon_685 685
+#define frame_mach_hexagon_686 686
+#define frame_mach_hexagon_688 688
+#define frame_mach_hexagon_690 690
+#define frame_mach_hexagon_692 692
+#define frame_mach_hexagon_694 694
+#define frame_mach_hexagon_696 696
+#define frame_mach_hexagon_698 698
+#define frame_mach_hexagon_V70 70
+#define frame_mach_hexagon_V70t 71
+#define frame_mach_hexagon_V73 73
+#define frame_mach_hexagon_770 770
+#define frame_mach_hexagon_780 780
   frame_arch_last
   };
 
