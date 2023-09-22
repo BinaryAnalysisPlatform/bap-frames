@@ -101,6 +101,7 @@ type t =
   | AArch64
   | I8051
   | SM83
+  | Hexagon
   | Last
 [@@deriving enumerate, variants]
 
