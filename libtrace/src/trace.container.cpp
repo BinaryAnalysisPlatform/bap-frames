@@ -149,8 +149,9 @@ namespace SerializedTrace {
     /* Read number of frames per toc entry. */
     READ(frames_per_toc_entry);
 
+    size_t add = (num_frames % frames_per_toc_entry != 0) ? 1 : 0;
     /* Read each toc entry. */
-    for (int i = 0; i < ((num_frames - 1) / frames_per_toc_entry); i++) {
+    for (int i = 0; i < (num_frames / frames_per_toc_entry) + add; i++) {
       uint64_t offset;
       READ(offset);
       toc.push_back(offset);
