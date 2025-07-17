@@ -31,18 +31,22 @@
 
 ## C++ `libtrace` library
 
-1. Generate configuration files
+1. Install [piqi](https://piqi.org/downloads/) so you have the `piqi` binary in `PATH`.
+
+2. Install `protobuf-devel` (Debian: `libprotobuf-dev`).
+
+3. Generate configuration files
    ```
    cd libtrace
    ./autogen.sh
    ```
 
-2. Configure (use configuration options to your taste)
+4. Configure (use configuration options to your taste)
    ```
    ./configure
    ```
 
-3. Compile and install
+5. Compile and install
    ```
    make
    make install
