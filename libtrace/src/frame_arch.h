@@ -422,6 +422,9 @@ enum frame_architecture
 #define frame_mach_hexagon_V73 73
 #define frame_mach_hexagon_770 770
 #define frame_mach_hexagon_780 780
+
+  frame_arch_tricore, /* Infineon TriCore */
+#define frame_mach_tricore_162 162
   frame_arch_last
   };
 
