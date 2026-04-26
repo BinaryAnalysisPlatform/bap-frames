@@ -425,6 +425,11 @@ enum frame_architecture
 
   frame_arch_tricore, /* Infineon TriCore */
 #define frame_mach_tricore_162 162
+
+  frame_arch_riscv, /* RISC-V */
+#define frame_mach_riscv32 32
+#define frame_mach_riscv64 64
+
   frame_arch_last
   };
 
