@@ -9,6 +9,7 @@
   .field [.name user   .type string]
   .field [.name host   .type string]
   .field [.name time   .type float]
+  .field [.name isa    .type string .optional]
 ]
 
 % description of the trace tool
